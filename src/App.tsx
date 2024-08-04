@@ -1,6 +1,6 @@
 import { useState } from "react";
-import HomeScreen from "./components/screens/HomeScreen";
-import GameScreen from "./components/screens/GameScreen";
+import HomeScreen from "./screens/HomeScreen";
+import GameScreen from "./screens/GameScreen";
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -12,8 +12,8 @@ export default function App() {
   const continueGame = () => setGamePaused(false);
 
   return (
-    <div>
-      {gameStarted ? (
+    <main className="container h-full mx-auto flex justify-center items-start mt-20 px-4 sm:px-6 lg:px-8 max-w-[1500px]">
+      {1 ? (
         <GameScreen
           gamePaused={gamePaused}
           pauseGame={pauseGame}
@@ -23,6 +23,6 @@ export default function App() {
       ) : (
         <HomeScreen startGame={startGame} />
       )}
-    </div>
+    </main>
   );
 }

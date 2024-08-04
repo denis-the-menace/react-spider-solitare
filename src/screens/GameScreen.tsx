@@ -1,4 +1,5 @@
-import PauseMenu from "./components/ui/PauseMenu";
+import PauseMenu from "../components/ui/PauseMenu";
+import Game from "../components/Game";
 
 interface GameScreenProps {
   gamePaused: boolean;
@@ -19,7 +20,7 @@ export default function GameScreen({
   };
 
   return (
-    <div>
+    <div className="bg-green-700 container">
       <div style={{ position: "relative" }}>
         <button
           style={{ position: "absolute", top: "10px", right: "10px" }}
@@ -27,10 +28,7 @@ export default function GameScreen({
         >
           Pause
         </button>
-        <div>
-          {/* Your game implementation goes here */}
-          <p>Game content...</p>
-        </div>
+        <Game />
       </div>
 
       {gamePaused && (
