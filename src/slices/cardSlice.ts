@@ -94,23 +94,22 @@ const cardSlice = createSlice({
   reducers: {
     initializeDeck: (state) => {
       const deck = shuffleDeck(generateDeck());
-      const tableauCards = deck.slice(0, 28).map((card, index) => ({
+      const tableauCards = deck.slice(0, 10).map((card, index) => ({
         ...card,
+        zIndex: 50,
         faceUp: index % 7 === 0,
-        position: { x: index % 10, y: Math.floor(index / 10) }, // Column-based positions
-        isMovable: index >= 10, // Only top cards are movable initially
+        position: { x: index + 1, y: 2 },
       }));
 
       const stockCards = deck.slice(28).map((card) => ({
         ...card,
         faceUp: false,
-        position: { x: 0, y: 0 },
+        position: { x: 1, y: 1 },
         isMovable: true,
         isMoving: false,
       }));
 
       state.deck = [...tableauCards, ...stockCards];
-      console.log(state.deck);
       state.stock = stockCards;
       state.tableau = tableauCards;
     },
@@ -119,10 +118,11 @@ const cardSlice = createSlice({
       action: PayloadAction<{ id: string; position: { x: number; y: number } }>,
     ) => {
       const { id, position } = action.payload;
+      console.log(id, position);
       const card = state.deck.find((card) => card.id === id);
       if (card) {
         card.position = position;
-        console.log(state.deck.find((card) => card.id === id));
+        console.log(JSON.stringify(state.deck.find((card) => card.id === id)));
       }
     },
     stackCards: (
