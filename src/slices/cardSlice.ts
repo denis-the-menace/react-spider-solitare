@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+const cardWidth = 144;
+
 interface CardProperties {
   readonly id: string;
   readonly src: string;
@@ -7,6 +9,7 @@ interface CardProperties {
   readonly suit: string;
   readonly rank: number;
 }
+
 interface CardState {
   zIndex: number;
   faceUp: boolean;
@@ -29,8 +32,8 @@ interface DeckState {
   stock: Card[];
   tableau: Card[];
   foundation: Card[];
-  tableauZones: { [key: number]: Zone }; // Define zone properties
-  foundationZones: { [key: number]: Zone }; // Define zone properties
+  tableauZones: { [key: number]: Zone };
+  foundationZones: { [key: number]: Zone };
 }
 
 const suits = ["hearts", "diamonds", "clubs", "spades"];
@@ -68,10 +71,20 @@ const initialState: DeckState = {
   tableau: [],
   foundation: [],
   tableauZones: Array.from({ length: 10 }, (_, index) => ({
-    [index]: { x: index, y: 0, width: 1, height: 10 }, // Example positions and sizes
+    [index]: {
+      x: index * cardWidth,
+      y: 0,
+      width: cardWidth,
+      height: 1000, // Arbitrary large height for stacking
+    },
   })).reduce((acc, cur) => ({ ...acc, ...cur }), {}),
   foundationZones: Array.from({ length: 8 }, (_, index) => ({
-    [index]: { x: index, y: 0, width: 1, height: 10 }, // Example positions and sizes
+    [index]: {
+      x: index * cardWidth,
+      y: 0,
+      width: cardWidth,
+      height: 1000,
+    },
   })).reduce((acc, cur) => ({ ...acc, ...cur }), {}),
 };
 
@@ -81,10 +94,11 @@ const cardSlice = createSlice({
   reducers: {
     initializeDeck: (state) => {
       const deck = shuffleDeck(generateDeck());
-      const tableauCards = deck.slice(0, 10).map((card, index) => ({
+      const tableauCards = deck.slice(0, 28).map((card, index) => ({
         ...card,
         faceUp: index % 7 === 0,
-        position: { x: index % 10, y: Math.floor(index / 10) }, // Adjust based on grid layout
+        position: { x: index % 10, y: Math.floor(index / 10) }, // Column-based positions
+        isMovable: index >= 10, // Only top cards are movable initially
       }));
 
       const stockCards = deck.slice(28).map((card) => ({
@@ -96,6 +110,7 @@ const cardSlice = createSlice({
       }));
 
       state.deck = [...tableauCards, ...stockCards];
+      console.log(state.deck);
       state.stock = stockCards;
       state.tableau = tableauCards;
     },
@@ -106,26 +121,8 @@ const cardSlice = createSlice({
       const { id, position } = action.payload;
       const card = state.deck.find((card) => card.id === id);
       if (card) {
-        // Check if the new position is within any valid drop zone
-        const isValidPosition =
-          Object.values(state.tableauZones).some(
-            (zone) =>
-              position.x >= zone.x &&
-              position.x < zone.x + zone.width &&
-              position.y >= zone.y &&
-              position.y < zone.y + zone.height,
-          ) ||
-          Object.values(state.foundationZones).some(
-            (zone) =>
-              position.x >= zone.x &&
-              position.x < zone.x + zone.width &&
-              position.y >= zone.y &&
-              position.y < zone.y + zone.height,
-          );
-
-        if (isValidPosition) {
-          card.position = position;
-        }
+        card.position = position;
+        console.log(state.deck.find((card) => card.id === id));
       }
     },
     stackCards: (
@@ -137,19 +134,16 @@ const cardSlice = createSlice({
       const targetCard = state.deck.find((card) => card.id === targetId);
 
       if (draggedCard && targetCard) {
-        // Ensure that the target card position is correct
-        if (
-          draggedCard.position.x === targetCard.position.x &&
-          draggedCard.position.y === targetCard.position.y
-        ) {
-          // Move the dragged card to the target card's position
-          draggedCard.position = { ...targetCard.position };
-          draggedCard.isMovable = false;
-          targetCard.isMovable = true;
+        // Stack the dragged card on top of the target card
+        draggedCard.position = {
+          ...targetCard.position,
+          y: targetCard.position.y + 30, // Stack cards with offset
+        };
+        draggedCard.zIndex = targetCard.zIndex + 1;
 
-          // Ensure the zIndex is updated for stacking
-          draggedCard.zIndex = (targetCard.zIndex || 0) + 1;
-        }
+        // Make the dragged card immovable if needed
+        draggedCard.isMovable = true;
+        targetCard.isMovable = true;
       }
     },
   },

@@ -1,66 +1,42 @@
-import { useState } from 'react';
-import Card from './Card';
+import { ItemTypes } from "./Card";
+import { useDrop } from "react-dnd";
 
-type CardData = {
-  id: string;
-  src: string;
-  alt: string;
-  position: { x: number; y: number };
-};
-
-export default function CardArea() {
-  const [cards, setCards] = useState<CardData[]>([
-    // Initialize with your card data
-  ]);
-
-  const handleDrag = (id: string, data: { x: number; y: number }) => {
-    setCards(prevCards =>
-      prevCards.map(card =>
-        card.id === id ? { ...card, position: data } : card
-      )
-    );
+export default function CardArea({
+  x,
+  y,
+  children,
+}: {
+  x: number;
+  y: number;
+  children?: React.ReactElement;
+}) {
+  const moveCard = (x: number, y: number) => {
+    console.log("Move card", x, y);
   };
 
-  const handleDragStop = (id: string, data: { x: number; y: number }) => {
-    const draggedCard = cards.find(card => card.id === id);
-    if (!draggedCard) return;
-
-    const overlappingCard = cards.find(card => 
-      card.id !== id && isOverlapping(draggedCard, card, data)
-    );
-
-    if (overlappingCard) {
-      // Stack the cards
-      setCards(prevCards =>
-        prevCards.filter(card => card.id !== id)
-          .concat({ ...draggedCard, position: overlappingCard.position })
-      );
-    } else {
-      handleDrag(id, data);
-    }
-  };
-
-  const isOverlapping = (card1: CardData, card2: CardData, newPosition: { x: number; y: number }) => {
-    const threshold = 50; // Adjust based on your needs
-    const dx = Math.abs(newPosition.x - card2.position.x);
-    const dy = Math.abs(newPosition.y - card2.position.y);
-    return dx < threshold && dy < threshold;
-  };
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: ItemTypes.card,
+      drop: () => moveCard(x, y),
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+      }),
+    }),
+    [x, y],
+  );
 
   return (
-    <div className="relative w-full h-full">
-      {cards.map(card => (
-        <Card
-          key={card.id}
-          id={card.id}
-          src={card.src}
-          alt={card.alt}
-          isMovable={true}
-          position={card.position}
-          onDrag={(_, data) => handleDrag(card.id, data)}
-          onStop={(_, data) => handleDragStop(card.id, data)}
-        />
-      ))}
+    <div
+      ref={drop}
+      className={`${isOver ? "bg-yellow-500" : "bg-black"} relative w-30 h-48`}
+      style={{
+        gridColumn: `${x} / span 1`,
+        gridRow: `${y} / span 1`,
+        // gridColumn: `${card.position.x + 1} / span 1`,
+        // gridRow: `${card.position.y + 1} / span 1`,
+      }}
+    >
+      {children}
     </div>
   );
 }
