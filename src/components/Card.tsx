@@ -24,7 +24,7 @@ export default function Card({ card }: CardProps) {
         isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
       }`}
       style={{
-        zIndex: card.zIndex,
+        zIndex: card.position.z,
         top: `${card.position.z * 32}px`,
       }}
     >

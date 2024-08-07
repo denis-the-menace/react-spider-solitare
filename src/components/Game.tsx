@@ -13,7 +13,6 @@ export interface CardProps {
 }
 
 export interface CardState {
-  zIndex: number; // Layer position for overlapping cards
   faceUp: boolean; // Whether the card is face up or face down
   position: { x: number; y: number; z: number }; // Position on the board
   isMovable: boolean; // Whether the card can be moved
@@ -41,7 +40,6 @@ export class Game {
             alt: `${suit}_${i}`,
             suit,
             rank: i,
-            zIndex: 0,
             faceUp: false,
             isMovable: false,
             isMoving: false,
@@ -118,18 +116,20 @@ export class Game {
 
   public moveCard(cardId: string, toX: number, toY: number): void {
     const card = this.cards.find((c) => c.id === cardId);
-    if (!card) return;
+    if (!card || !card.isMovable) return; // Only move if the card is movable
 
-    if (!card.isMovable) return; // Only move if the card is movable
+    // Find the highest z position in the target area (toX, toY)
+    const highestZ = this.cards
+      .filter((c) => c.position.x === toX && c.position.y === toY)
+      .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), 0);
 
     // Update position and zIndex for the moved card
     this.cards = this.cards.map((c) =>
       c.id === cardId
         ? {
-            ...c,
-            position: { x: toX, y: toY, z: c.position.z + 1 },
-            zIndex: c.zIndex + 1,
-          }
+          ...c,
+          position: { x: toX, y: toY, z: highestZ + 1 },
+        }
         : c,
     );
 
