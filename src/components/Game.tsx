@@ -15,16 +15,16 @@ export interface CardProps {
 export interface CardState {
   zIndex: number; // Layer position for overlapping cards
   faceUp: boolean; // Whether the card is face up or face down
-  position: { x: number; y: number }; // Position on the board
+  position: { x: number; y: number; z: number }; // Position on the board
   isMovable: boolean; // Whether the card can be moved
   isMoving: boolean; // Whether the card is currently being moved
-  location: "tableau" | "stock"; // New state to track card location
+  location: "tableau" | "stock" | "foundation"; // New state to track card location
 }
 
 export type Card = CardProps & CardState;
 export type CardObserver = (
   cardId: string,
-  position: { x: number; y: number }
+  position: { x: number; y: number; z: number },
 ) => void;
 
 export class Game {
@@ -32,43 +32,71 @@ export class Game {
   private observers: CardObserver[] = []; // List of observers
 
   constructor() {
-    suits.forEach((suit) => {
-      for (let i = 1; i <= 13; i++) {
-        this.cards.push({
-          id: `${suit}-${i}`,
-          src: `cards/${suit}_${i}.png`,
-          alt: `${suit}_${i}`,
-          suit,
-          rank: i,
-          zIndex: 0,
-          faceUp: false,
-          isMovable: false,
-          isMoving: false,
-          position: { x: 0, y: 0 },
-          location: "stock", // Default to stock
-        });
-      }
-    });
+    const generateDeck = (deckNo: number) => {
+      suits.forEach((suit) => {
+        for (let i = 1; i <= 13; i++) {
+          this.cards.push({
+            id: `${suit}-${i}-${deckNo}`,
+            src: `cards/${suit}_${i}.png`,
+            alt: `${suit}_${i}`,
+            suit,
+            rank: i,
+            zIndex: 0,
+            faceUp: false,
+            isMovable: false,
+            isMoving: false,
+            position: { x: 0, y: 0, z: 0 },
+            location: "stock",
+          });
+        }
+      });
+    };
 
-    // Shuffle the deck
+    for (let i = 1; i <= 2; i++) {
+      generateDeck(i);
+    }
+
     const shuffledDeck = this.shuffleDeck(this.cards);
 
-    // Select 28 cards for the tableau
-    const tableauCards = shuffledDeck.slice(0, 28);
+    const tableauCards = shuffledDeck.slice(0, 54);
 
-    // Assign random positions in the range of 1-10
-    tableauCards.forEach((card, index) => {
-      card.position = {
-        x: Math.floor(Math.random() * 10) + 1, // Random x from 1 to 10
-        y: 2, // All cards in tableau have y = 1
-      };
-      card.faceUp = true; // Face-up in tableau
-      card.isMovable = true; // Movable within the tableau
-      card.location = "tableau"; // Mark as in tableau
-    });
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 6; j++) {
+        const cardIndex = i * 6 + j;
+        tableauCards[cardIndex].position = {
+          x: i,
+          y: 1,
+          z: j,
+        };
+        tableauCards[cardIndex].location = "tableau";
 
-    // Update the cards list with the tableau configuration
-    this.cards = [...tableauCards, ...shuffledDeck.slice(28)];
+        // Set the top card face up and movable
+        if (j === 5) {
+          tableauCards[cardIndex].faceUp = true;
+          tableauCards[cardIndex].isMovable = true;
+        }
+      }
+    }
+
+    for (let i = 4; i < 10; i++) {
+      for (let j = 0; j < 5; j++) {
+        const cardIndex = 24 + (i - 4) * 5 + j;
+        tableauCards[cardIndex].position = {
+          x: i,
+          y: 1,
+          z: j,
+        };
+        tableauCards[cardIndex].location = "tableau";
+
+        // Set the top card face up and movable
+        if (j === 4) {
+          tableauCards[cardIndex].faceUp = true;
+          tableauCards[cardIndex].isMovable = true;
+        }
+      }
+    }
+
+    this.cards = [...tableauCards, ...shuffledDeck.slice(54)];
   }
 
   private shuffleDeck(deck: Card[]): Card[] {
@@ -99,10 +127,10 @@ export class Game {
       c.id === cardId
         ? {
             ...c,
-            position: { x: toX, y: toY },
-            zIndex: c.zIndex + 1, // Bring the card to the front
+            position: { x: toX, y: toY, z: c.position.z + 1 },
+            zIndex: c.zIndex + 1,
           }
-        : c
+        : c,
     );
 
     this.emitChange(cardId);

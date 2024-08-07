@@ -19,18 +19,30 @@ export default function Card({ card }: CardProps) {
 
   return (
     <div
-      ref={drag}
-      className={`card-handle absolute w-32 h-48 cursor-grab ${
-        isDragging ? "cursor-grabbing" : ""
+      ref={card.isMovable ? drag : null}
+      className={`absolute w-32 h-48 cursor-grab select-none ${
+        isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
       }`}
-      key={card.alt} // Force re-render on position change
+      style={{
+        zIndex: card.zIndex,
+        top: `${card.position.z * 32}px`,
+      }}
     >
-      <img
-        src={card.src}
-        alt={card.alt}
-        className="w-full h-full object-cover pointer-events-none"
-        draggable={false}
-      />
+      {card.faceUp ? (
+        <img
+          src={card.src}
+          alt={card.alt}
+          className="w-full h-full object-cover pointer-events-none"
+          draggable={false}
+        />
+      ) : (
+        <img
+          src="cards/back_1.png"
+          alt="back"
+          className="w-full h-full object-cover pointer-events-none"
+          draggable={false}
+        />
+      )}
     </div>
   );
 }

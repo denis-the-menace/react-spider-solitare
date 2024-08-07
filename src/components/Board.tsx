@@ -22,17 +22,23 @@ export default function Board({ game }: BoardProps) {
         ),
       );
     });
-    console.log(game);
     return unsubscribe;
   }, [game]);
 
+  const stock = cards.filter((card) => card.location === "stock");
+  const tableau = cards.filter((card) => card.location === "tableau");
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="grid grid-cols-10 grid-rows-2 gap-4 h-full">
-        <Stock />
-        <Foundation />
+      <div className="grid grid-cols-10 grid-rows-2 gap-8 w-full h-full">
+        <div className="col-span-2 row-span-1">
+          <Stock cards={stock} game={game} />
+        </div>
+        <div className="col-span-8 row-span-1">
+          <Foundation game={game} />
+        </div>
         <div className="col-span-10 row-span-1">
-          <Tableau cards={cards} game={game} />
+          <Tableau cards={tableau} game={game} />
         </div>
       </div>
     </DndProvider>

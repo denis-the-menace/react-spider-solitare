@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { ItemTypes, Card as CardType, Game } from "./Game";
 import { useDrop } from "react-dnd";
-import Card from "./Card";
 
 interface CardAreaProps {
   x: number;
@@ -29,7 +28,7 @@ export default function CardArea({ x, y, children, game }: CardAreaProps) {
   return (
     <div
       ref={drop}
-      className={`w-32 h-48 flex items-center justify-center ${
+      className={`w-32 h-48 flex items-center justify-center relative ${
         isOver ? "bg-lightblue" : "bg-transparent"
       } transition-colors duration-300 border border-gray-300 shadow-md`}
       style={{

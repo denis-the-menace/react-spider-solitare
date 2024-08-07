@@ -24,7 +24,7 @@ export default function GameScreen({
   const game = useMemo(() => new Game(), []);
 
   return (
-    <div className="bg-green-700 container">
+    <div className="bg-green-700 w-full">
       <div style={{ position: "relative" }}>
         <button
           style={{ position: "absolute", top: "10px", right: "10px" }}
