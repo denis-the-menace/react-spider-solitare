@@ -114,26 +114,98 @@ export class Game {
     };
   }
 
+  private emitChange(cardId: string): void {
+    const card = this.cards.find((c) => c.id === cardId);
+    if (card) {
+      this.observers.forEach((o) => o && o(cardId, card.position));
+    }
+  }
+
   public moveCard(cardId: string, toX: number, toY: number): void {
     const card = this.cards.find((c) => c.id === cardId);
-    if (!card || !card.isMovable) return; // Only move if the card is movable
+    if (!card || !card.isMovable) return;
 
-    // Find the highest z position in the target area (toX, toY)
     const highestZ = this.cards
       .filter((c) => c.position.x === toX && c.position.y === toY)
       .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), 0);
 
-    // Update position and zIndex for the moved card
-    this.cards = this.cards.map((c) =>
-      c.id === cardId
-        ? {
-          ...c,
-          position: { x: toX, y: toY, z: highestZ + 1 },
-        }
-        : c,
+    const hasHigherZ = this.cards.some(
+      (c) =>
+        c.position.x === card.position.x &&
+        c.position.y === card.position.y &&
+        c.position.z === card.position.z + 1,
     );
 
+    if (hasHigherZ) {
+      this.moveStack(cardId, toX, toY);
+    } else {
+      this.cards = this.cards.map((c) =>
+        c.id === cardId
+          ? {
+            ...c,
+            position: { x: toX, y: toY, z: highestZ + 1 },
+          }
+          : c,
+      );
+    }
+
     this.emitChange(cardId);
+  }
+
+  public moveStack(cardId: string, toX: number, toY: number): void {
+    console.log("Moving stack");
+
+    const card = this.cards.find((c) => c.id === cardId);
+    if (!card || !card.isMovable || !card.faceUp) return; // Only move if the card is face-up and movable
+
+    // Find all cards that need to be moved
+    const cardsToMove = this.cards.filter(
+      (c) =>
+        c.position.x === card.position.x &&
+        c.position.y === card.position.y &&
+        c.position.z >= card.position.z,
+    );
+
+    // Map cards to new positions with correct z-index
+    const updatedCardsToMove = cardsToMove
+      .sort((a, b) => a.position.z - b.position.z) // Ensure cards are sorted by z-index
+      .map((c, index) => ({
+        ...c,
+        position: {
+          ...c.position,
+          x: toX,
+          y: toY,
+          z: index, // Set new z-index based on the index
+        },
+      }));
+
+    // Determine the highest z value at the new position
+    const highestZ = this.cards
+      .filter((c) => c.position.x === toX && c.position.y === toY)
+      .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), -1);
+
+    // Update the cards in the state
+    this.cards = this.cards.map((c) => {
+      const updatedCard = updatedCardsToMove.find((u) => u.id === c.id);
+      if (updatedCard) {
+        return {
+          ...c,
+          position: {
+            ...updatedCard.position,
+            z: highestZ + updatedCard.position.z + 1,
+          },
+        };
+      }
+      return c;
+    });
+
+    console.log(
+      this.cards.filter((c) => c.position.x === toX && c.position.y === toY),
+    );
+
+    updatedCardsToMove.forEach((card) => {
+      this.emitChange(card.id);
+    });
   }
 
   public canMoveCard(cardId: string, toX: number, toY: number): boolean {
@@ -145,13 +217,6 @@ export class Game {
 
     // Example logic for a simple move (should be replaced with actual rules)
     return Math.abs(toX - x) <= 1 && Math.abs(toY - y) <= 1;
-  }
-
-  private emitChange(cardId: string): void {
-    const card = this.cards.find((c) => c.id === cardId);
-    if (card) {
-      this.observers.forEach((o) => o && o(cardId, card.position));
-    }
   }
 
   public getCards(): Card[] {
