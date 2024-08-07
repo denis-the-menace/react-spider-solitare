@@ -1,55 +1,43 @@
-import React from "react";
-import { ItemTypes } from "./Card";
+import type { ReactNode } from "react";
+import { ItemTypes, Card as CardType, Game } from "./Game";
 import { useDrop } from "react-dnd";
-import { useAppDispatch } from "../hooks";
-import { updateCardPosition } from "../slices/cardSlice";
 import Card from "./Card";
 
-export default function CardArea({
-  x,
-  y,
-  cards,
-}: {
+interface CardAreaProps {
   x: number;
   y: number;
-  cards: Array<{ id: string, src: string, alt: string, isMovable: boolean }>;
-}) {
-  const dispatch = useAppDispatch();
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: ItemTypes.card,
-    drop: (item: { id: string }) => {
-      console.log("CardArea drop", item.id, x, y);
-      dispatch(updateCardPosition({ id: item.id, position: { x, y } }));
-    },
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+  children?: ReactNode;
+  game: Game;
+}
+
+export default function CardArea({ x, y, children, game }: CardAreaProps) {
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: ItemTypes.CARD,
+      // canDrop: () => true,
+      drop: (item: { id: string }) => {
+        game.moveCard(item.id, x, y);
+      },
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+        // canDrop: !!monitor.canDrop(),
+      }),
     }),
-  }), [x, y, dispatch]);
+    [game],
+  );
 
   return (
-    <div 
-      ref={drop} 
-      style={{ 
-        position: 'absolute', 
-        left: x, 
-        top: y, 
-        width: '100%', 
-        height: '100%',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(128px, 1fr))',
-        gridTemplateRows: 'repeat(auto-fill, minmax(192px, 1fr))',
-        backgroundColor: isOver ? 'lightblue' : 'transparent'
+    <div
+      ref={drop}
+      className={`w-32 h-48 flex items-center justify-center ${
+        isOver ? "bg-lightblue" : "bg-transparent"
+      } transition-colors duration-300 border border-gray-300 shadow-md`}
+      style={{
+        gridColumnStart: x + 1,
+        gridRowStart: y + 1,
       }}
     >
-      {cards.map(card => (
-        <Card
-          key={card.id}
-          id={card.id}
-          src={card.src}
-          alt={card.alt}
-          isMovable={card.isMovable}
-        />
-      ))}
+      {children}
     </div>
   );
 }
