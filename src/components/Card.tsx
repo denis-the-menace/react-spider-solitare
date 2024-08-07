@@ -19,7 +19,7 @@ export default function Card({ card }: CardProps) {
 
   return (
     <div
-      ref={card.isMovable ? drag : null}
+      ref={card.faceUp ? drag : null}
       className={`absolute w-32 h-48 cursor-grab select-none ${
         isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
       }`}
