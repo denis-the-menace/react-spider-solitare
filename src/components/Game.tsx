@@ -116,10 +116,37 @@ export class Game {
       );
     }
   }
+  public canMoveCard(card: Card, toX: number, toY: number): boolean {
+    // draglenen yerde card var mi diye bak
+    // renkler farkli degilse return false
+    // eger dragledigimiz card'in ranki targetCard'inkinden 1 buyuk degilse return false
+
+    const targetCard = this.cards
+      .filter((c) => c.position.x === toX && c.position.y === toY)
+      .reduce((maxCard, c) =>
+        c.position.z > maxCard.position.z ? c : maxCard,
+      );
+
+    if (targetCard.location === "foundation") {
+      // checkFoundation()
+      // return false;
+    }
+
+    const isSameColor =
+      (["hearts", "diamonds"].includes(card.suit) &&
+        ["hearts", "diamonds"].includes(targetCard.suit)) ||
+      (["clubs", "spades"].includes(card.suit) &&
+        ["clubs", "spades"].includes(targetCard.suit));
+    if (isSameColor) return false;
+
+    if (card.rank !== targetCard.rank - 1) return false;
+
+    return true;
+  }
 
   public moveCard(cardId: string, toX: number, toY: number): void {
     const card = this.cards.find((c) => c.id === cardId);
-    if (!card || !card.faceUp) return;
+    if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
 
     const isNotTopCard = this.cards.some(
       (c) =>
@@ -132,7 +159,7 @@ export class Game {
       this.moveStack(cardId, toX, toY);
     } else {
       // move ettigimiz stack'in en ustteki karti
-      const topCardZ = this.cards
+      const targetCardZ = this.cards
         .filter((c) => c.position.x === toX && c.position.y === toY)
         .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), 0);
 
@@ -159,7 +186,7 @@ export class Game {
         c.id === cardId
           ? {
               ...c,
-              position: { x: toX, y: toY, z: topCardZ + 1 },
+              position: { x: toX, y: toY, z: targetCardZ + 1 },
             }
           : c,
       );
@@ -170,7 +197,7 @@ export class Game {
 
   public moveStack(cardId: string, toX: number, toY: number): void {
     const card = this.cards.find((c) => c.id === cardId);
-    if (!card || !card.faceUp) return;
+    if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
 
     const cardsToMove = this.cards.filter(
       (c) =>
@@ -191,7 +218,7 @@ export class Game {
         },
       }));
 
-    const topCardZ = this.cards
+    const targetCardZ = this.cards
       .filter((c) => c.position.x === toX && c.position.y === toY)
       .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), -1);
 
@@ -221,7 +248,7 @@ export class Game {
           ...c,
           position: {
             ...updatedCard.position,
-            z: topCardZ + updatedCard.position.z + 1,
+            z: targetCardZ + updatedCard.position.z + 1,
           },
         };
       }
@@ -231,17 +258,6 @@ export class Game {
     updatedCardsToMove.forEach((card) => {
       this.emitChange(card.id);
     });
-  }
-
-  public canMoveCard(cardId: string, toX: number, toY: number): boolean {
-    const card = this.cards.find((c) => c.id === cardId);
-    if (!card || !card.faceUp) return false;
-
-    // Implement Solitaire-specific move logic
-    const { x, y } = card.position;
-
-    // Example logic for a simple move (should be replaced with actual rules)
-    return Math.abs(toX - x) <= 1 && Math.abs(toY - y) <= 1;
   }
 
   public getCards(): Card[] {
