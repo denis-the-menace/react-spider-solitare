@@ -25,14 +25,12 @@ export default function Card({ card }: CardProps) {
       style={{
         zIndex: card.position.z,
         top:
-          (card.position.x === 0 && card.position.y === 0) ||
-            (card.position.x === 1 && card.position.y === 0)
+          card.position.x === 0 && card.position.y === 0
             ? ""
             : `${card.position.z * 32}px`,
       }}
     >
-      {card.faceUp ||
-        (card.faceUp && card.position.x === 0 && card.position.y === 0) ? (
+      {card.faceUp ? (
         <img
           src={card.src}
           alt={card.alt}

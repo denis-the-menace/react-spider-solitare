@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ItemTypes, Game } from "./Game";
 import { useDrop } from "react-dnd";
 
-interface CardAreaProps {
+interface FoundationCardAreaProps {
   x: number;
   y: number;
   children?: ReactNode;
@@ -16,7 +16,7 @@ export default function CardArea({
   children,
   game,
   onClick,
-}: CardAreaProps) {
+}: FoundationCardAreaProps) {
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ItemTypes.CARD,
@@ -39,7 +39,9 @@ export default function CardArea({
         gridColumnStart: x + 1,
         gridRowStart: y + 1,
       }}
-      onClick={x === 0 && y === 0 ? onClick : undefined}
+      onClick={
+        (x === 0 && y === 0) || (x === 1 && y === 0) ? onClick : undefined
+      }
     >
       {children}
     </div>

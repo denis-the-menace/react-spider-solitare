@@ -89,8 +89,8 @@ export class Game {
     }
 
     const stock = shuffledDeck.slice(54);
-    stock.forEach((card, index) => {
-      card.position = { x: 0, y: 0, z: index };
+    stock.forEach((card) => {
+      card.position = { x: 0, y: 0, z: 0 };
       card.location = "stock";
       card.faceUp = false;
     });
@@ -122,6 +122,7 @@ export class Game {
       );
     }
   }
+
   public canMoveCard(card: Card, toX: number, toY: number): boolean {
     // draglenen yerde card var mi diye bak
     // renkler farkli degilse return false
@@ -197,7 +198,9 @@ export class Game {
           : c,
       );
     }
-    console.log(this.cards.filter((c) => c.position.x === toX && c.position.y === toY));
+    console.log(
+      this.cards.filter((c) => c.position.x === toX && c.position.y === toY),
+    );
 
     this.emitChange(cardId);
   }
@@ -267,49 +270,31 @@ export class Game {
     });
   }
 
-  public moveStockCard(stock: Card[]): void {
-    const topCard = stock.reduce(
-      (highest, card) => {
-        if (
-          card.position.x === 0 &&
-          (highest === null || card.position.z > highest.position.z)
-        ) {
-          return card;
-        }
-        return highest;
-      },
-      null as Card | null,
-    );
+  public dealStockCards(stock: Card[]): void {
+    for (let i = 0; i < 10; i++) {
+      const topCard = stock.shift();
 
-    if (!topCard) {
-      stock.forEach((card, index) => {
-        this.cards = this.cards.map((c) =>
-          c.id === card.id
-            ? {
-              ...c,
-              position: { x: 0, y: 0, z: index },
-              faceUp: false,
-            }
-            : c,
-        );
-        this.emitChange(card.id);
-      });
-      return;
+      if (!topCard) return;
+
+      const tableauCards = this.cards.filter(
+        (c) => c.position.x === i && c.position.y === 1,
+      );
+
+      const zIndex = tableauCards.length;
+
+      this.cards = this.cards.map((card) =>
+        card.id === topCard.id
+          ? {
+            ...card,
+            position: { x: i, y: 1, z: zIndex },
+            location: "tableau",
+            faceUp: true,
+          }
+          : card,
+      );
+
+      this.emitChange(topCard.id);
     }
-
-    const rightSideCards = stock.filter((card) => card.position.x === 1) || [];
-
-    this.cards = this.cards.map((card) =>
-      card.id === topCard.id
-        ? {
-          ...card,
-          position: { x: 1, y: 0, z: rightSideCards.length + 1 },
-          faceUp: true,
-        }
-        : card,
-    );
-
-    this.emitChange(topCard.id);
   }
 
   public getCards(): Card[] {

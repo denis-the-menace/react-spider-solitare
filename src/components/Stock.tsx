@@ -15,7 +15,7 @@ export default function Stock({ cards, game }: StockProps) {
   );
 
   const handleLeftClick = () => {
-    game.moveStockCard(stock);
+    game.dealStockCards(stock);
   };
 
   return (
@@ -30,13 +30,6 @@ export default function Stock({ cards, game }: StockProps) {
         {stock.map((card) => (
           <Card key={card.id} card={card} />
         ))}
-      </CardArea>
-      <CardArea x={1} y={0} game={game}>
-        {stock
-          .filter((card) => card.position.x === 1 && card.position.y === 0)
-          .map((card) => (
-            <Card key={card.id} card={card} />
-          ))}
       </CardArea>
     </div>
   );
