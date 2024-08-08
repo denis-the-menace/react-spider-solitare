@@ -26,12 +26,6 @@ export default function GameScreen({
   return (
     <div className="bg-green-700 w-full">
       <div style={{ position: "relative" }}>
-        <button
-          style={{ position: "absolute", top: "10px", right: "10px" }}
-          onClick={pauseGame}
-        >
-          Pause
-        </button>
         <Board game={game} />
       </div>
 

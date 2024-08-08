@@ -7,7 +7,7 @@ interface FoundationProps {
 
 export default function Foundation({ game }: FoundationProps) {
   const renderCardArea = (i: number) => {
-    const x = i;
+    const x = i + 1;
     const y = 0;
 
     return (

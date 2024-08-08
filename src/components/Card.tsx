@@ -1,5 +1,5 @@
 import { useDrag } from "react-dnd";
-import { ItemTypes, Card as CardType, Game } from "./Game";
+import { ItemTypes, Card as CardType } from "./Game";
 
 interface CardProps {
   card: CardType;
@@ -9,26 +9,30 @@ export default function Card({ card }: CardProps) {
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: ItemTypes.CARD,
-      item: { id: card.id },
+      item: { id: card?.id || "" },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [card.id],
+    [card?.id],
   );
 
   return (
     <div
       ref={card.faceUp ? drag : null}
-      className={`absolute w-32 h-48 cursor-grab select-none ${
-        isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
-      }`}
+      className={`absolute w-32 h-48 cursor-grab select-none ${isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
+        }`}
       style={{
         zIndex: card.position.z,
-        top: `${card.position.z * 32}px`,
+        top:
+          (card.position.x === 0 && card.position.y === 0) ||
+            (card.position.x === 1 && card.position.y === 0)
+            ? ""
+            : `${card.position.z * 32}px`,
       }}
     >
-      {card.faceUp ? (
+      {card.faceUp ||
+        (card.faceUp && card.position.x === 0 && card.position.y === 0) ? (
         <img
           src={card.src}
           alt={card.alt}

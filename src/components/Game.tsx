@@ -10,16 +10,16 @@ const suits = ["hearts", "diamonds", "clubs", "spades"];
 
 export interface CardProps {
   readonly id: string;
-  readonly src: string; // Image source for the card
-  readonly alt: string; // Alt text for the image
-  readonly suit: string; // Hearts, Spades, Diamonds, Clubs
-  readonly rank: number; // 1-13 representing Ace to King
+  readonly src: string;
+  readonly alt: string;
+  readonly suit: string;
+  readonly rank: number;
 }
 
 export interface CardState {
-  faceUp: boolean; // Whether the card is face up or face down
-  position: { x: number; y: number; z: number }; // Position on the board
-  location: "tableau" | "stock" | "foundation"; // New state to track card location
+  faceUp: boolean;
+  position: { x: number; y: number; z: number };
+  location: "tableau" | "stock" | "foundation";
 }
 
 export type Card = CardProps & CardState;
@@ -32,7 +32,7 @@ export type CardObserver = (
 
 export class Game {
   public cards: Card[] = [];
-  private observers: CardObserver[] = []; // List of observers
+  private observers: CardObserver[] = [];
 
   constructor() {
     const generateDeck = (deckNo: number) => {
@@ -88,7 +88,14 @@ export class Game {
       }
     }
 
-    this.cards = [...tableauCards, ...shuffledDeck.slice(54)];
+    const stock = shuffledDeck.slice(54);
+    stock.forEach((card, index) => {
+      card.position = { x: 0, y: 0, z: index };
+      card.location = "stock";
+      card.faceUp = false;
+    });
+
+    this.cards = [...tableauCards, ...stock];
   }
 
   private shuffleDeck(deck: Card[]): Card[] {
@@ -98,7 +105,6 @@ export class Game {
   public observe(o: CardObserver): () => void {
     this.observers.push(o);
 
-    // Notify with all current card positions to initialize
     this.cards.forEach((card) => {
       o && o(card.id, card.position, card.faceUp, card.location);
     });
@@ -174,9 +180,9 @@ export class Game {
         this.cards = this.cards.map((c) =>
           c.id === newTopCard.id
             ? {
-                ...c,
-                faceUp: true,
-              }
+              ...c,
+              faceUp: true,
+            }
             : c,
         );
         this.emitChange(newTopCard.id);
@@ -185,12 +191,13 @@ export class Game {
       this.cards = this.cards.map((c) =>
         c.id === cardId
           ? {
-              ...c,
-              position: { x: toX, y: toY, z: targetCardZ + 1 },
-            }
+            ...c,
+            position: { x: toX, y: toY, z: targetCardZ + 1 },
+          }
           : c,
       );
     }
+    console.log(this.cards.filter((c) => c.position.x === toX && c.position.y === toY));
 
     this.emitChange(cardId);
   }
@@ -233,9 +240,9 @@ export class Game {
       this.cards = this.cards.map((c) =>
         c.id === newTopCard.id
           ? {
-              ...c,
-              faceUp: true,
-            }
+            ...c,
+            faceUp: true,
+          }
           : c,
       );
       this.emitChange(newTopCard.id);
@@ -258,6 +265,51 @@ export class Game {
     updatedCardsToMove.forEach((card) => {
       this.emitChange(card.id);
     });
+  }
+
+  public moveStockCard(stock: Card[]): void {
+    const topCard = stock.reduce(
+      (highest, card) => {
+        if (
+          card.position.x === 0 &&
+          (highest === null || card.position.z > highest.position.z)
+        ) {
+          return card;
+        }
+        return highest;
+      },
+      null as Card | null,
+    );
+
+    if (!topCard) {
+      stock.forEach((card, index) => {
+        this.cards = this.cards.map((c) =>
+          c.id === card.id
+            ? {
+              ...c,
+              position: { x: 0, y: 0, z: index },
+              faceUp: false,
+            }
+            : c,
+        );
+        this.emitChange(card.id);
+      });
+      return;
+    }
+
+    const rightSideCards = stock.filter((card) => card.position.x === 1) || [];
+
+    this.cards = this.cards.map((card) =>
+      card.id === topCard.id
+        ? {
+          ...card,
+          position: { x: 1, y: 0, z: rightSideCards.length + 1 },
+          faceUp: true,
+        }
+        : card,
+    );
+
+    this.emitChange(topCard.id);
   }
 
   public getCards(): Card[] {

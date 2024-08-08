@@ -8,14 +8,36 @@ interface StockProps {
 }
 
 export default function Stock({ cards, game }: StockProps) {
+  const stock = cards.filter(
+    (card) =>
+      (card.position.x === 0 && card.position.y === 0) ||
+      (card.position.x === 1 && card.position.y === 0),
+  );
+
+  const handleLeftClick = () => {
+    game.moveStockCard(stock);
+  };
+
   return (
     <div className="grid grid-cols-2 gap-2 h-full place-items-center">
-      <CardArea key={`${0}-${0}`} x={0} y={0} game={game}>
-        {cards.map((card) => (
+      <CardArea
+        key={`${0}-${0}`}
+        x={0}
+        y={0}
+        game={game}
+        onClick={handleLeftClick}
+      >
+        {stock.map((card) => (
           <Card key={card.id} card={card} />
         ))}
       </CardArea>
-      <CardArea x={1} y={0} game={game} />
+      <CardArea x={1} y={0} game={game}>
+        {stock
+          .filter((card) => card.position.x === 1 && card.position.y === 0)
+          .map((card) => (
+            <Card key={card.id} card={card} />
+          ))}
+      </CardArea>
     </div>
   );
 }

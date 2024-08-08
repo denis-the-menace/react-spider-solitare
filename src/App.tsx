@@ -12,7 +12,7 @@ export default function App() {
   const continueGame = () => setGamePaused(false);
 
   return (
-    <main className="container h-full mx-auto flex justify-center items-start mt-20 max-w-[1600px]">
+    <main className="container h-full mx-auto flex justify-center items-start mt-8 max-w-[1600px]">
       {1 ? (
         <GameScreen
           gamePaused={gamePaused}
