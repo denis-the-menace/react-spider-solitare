@@ -3,25 +3,15 @@ import { ItemTypes, Card as CardType } from "./Game";
 
 interface CardProps {
   card: CardType;
+  isDragging: boolean;
 }
 
-export default function Card({ card }: CardProps) {
-  const [{ isDragging }, drag] = useDrag(
-    () => ({
-      type: ItemTypes.CARD,
-      item: { id: card?.id || "" },
-      collect: (monitor) => ({
-        isDragging: !!monitor.isDragging(),
-      }),
-    }),
-    [card?.id],
-  );
-
+export default function Card({ card, isDragging }: CardProps) {
   return (
     <div
-      ref={card.faceUp ? drag : null}
-      className={`absolute w-32 h-48 cursor-grab select-none ${isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
-        }`}
+      className={`absolute w-32 h-48 cursor-grab select-none ${
+        isDragging ? "cursor-grabbing opacity-0" : "opacity-100"
+      }`}
       style={{
         zIndex: card.position.z,
         top:

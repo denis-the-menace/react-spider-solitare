@@ -17,10 +17,7 @@ export default function Tableau({ cards, game }: TableauProps) {
     );
 
     return (
-      <CardArea key={`${x}-${y}`} x={x} y={y} game={game}>
-        {cardsInArea.map((card) => (
-          <Card key={card.id} card={card} />
-        ))}
+      <CardArea key={`${x}-${y}`} x={x} y={y} game={game} cards={cardsInArea}>
       </CardArea>
     );
   };
