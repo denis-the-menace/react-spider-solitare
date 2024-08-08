@@ -125,7 +125,6 @@ export class Game {
 
   public canMoveCard(card: Card, toX: number, toY: number): boolean {
     // draglenen yerde card var mi diye bak
-    // renkler farkli degilse return false
     // eger dragledigimiz card'in ranki targetCard'inkinden 1 buyuk degilse return false
 
     const targetCard = this.cards
@@ -134,19 +133,23 @@ export class Game {
         c.position.z > maxCard.position.z ? c : maxCard,
       );
 
-    if (targetCard.location === "foundation") {
-      // checkFoundation()
-      // return false;
-    }
-
-    const isSameColor =
-      (["hearts", "diamonds"].includes(card.suit) &&
-        ["hearts", "diamonds"].includes(targetCard.suit)) ||
-      (["clubs", "spades"].includes(card.suit) &&
-        ["clubs", "spades"].includes(targetCard.suit));
-    if (isSameColor) return false;
-
     if (card.rank !== targetCard.rank - 1) return false;
+
+    return true;
+  }
+
+  public canMoveStack(card: Card, toX: number, toY: number): boolean {
+    // canMoveCard check ettikten sonra:
+    // eger stackteki tum cardlarin suiti ayni degilse return false
+    const cards = this.cards.filter(
+      (c) =>
+        c.position.x === card.position.x &&
+        c.position.y === card.position.y &&
+        c.position.z >= card.position.z,
+    );
+
+    const isSameSuit = cards.every((card) => card.suit === cards[0].suit);
+    if (!isSameSuit) return false;
 
     return true;
   }
@@ -163,7 +166,7 @@ export class Game {
     );
 
     if (isNotTopCard) {
-      this.moveStack(cardId, toX, toY);
+      this.canMoveStack(card, toX, toY) && this.moveStack(card, toX, toY);
     } else {
       // move ettigimiz stack'in en ustteki karti
       const targetCardZ = this.cards
@@ -197,16 +200,11 @@ export class Game {
           }
           : c,
       );
+      this.emitChange(cardId);
     }
-    console.log(
-      this.cards.filter((c) => c.position.x === toX && c.position.y === toY),
-    );
-
-    this.emitChange(cardId);
   }
 
-  public moveStack(cardId: string, toX: number, toY: number): void {
-    const card = this.cards.find((c) => c.id === cardId);
+  public moveStack(card: Card, toX: number, toY: number): void {
     if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
 
     const cardsToMove = this.cards.filter(

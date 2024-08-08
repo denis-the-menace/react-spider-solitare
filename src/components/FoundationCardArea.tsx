@@ -7,15 +7,13 @@ interface FoundationCardAreaProps {
   y: number;
   children?: ReactNode;
   game: Game;
-  onClick?: () => void;
 }
 
-export default function CardArea({
+export default function FoundationCardArea({
   x,
   y,
   children,
   game,
-  onClick,
 }: FoundationCardAreaProps) {
   const [{ isOver }, drop] = useDrop(
     () => ({
@@ -33,17 +31,20 @@ export default function CardArea({
   return (
     <div
       ref={drop}
-      className={`w-32 h-48 flex items-center justify-center relative ${isOver ? "bg-lightblue" : "bg-transparent"
+      className={`w-32 h-48 flex items-center justify-center relative ${isOver ? "bg-lightblue" : "bg-gray-900"
         } transition-colors duration-300 border border-gray-300 shadow-md`}
       style={{
         gridColumnStart: x + 1,
         gridRowStart: y + 1,
       }}
-      onClick={
-        (x === 0 && y === 0) || (x === 1 && y === 0) ? onClick : undefined
-      }
     >
-      {children}
+      {children ? (
+        children
+      ) : (
+        <p className="text-3xl text-white">
+          {x === 1 ? "♠" : x === 2 ? "♣" : x === 3 ? "♦" : "♥"}
+        </p>
+      )}
     </div>
   );
 }
