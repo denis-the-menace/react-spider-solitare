@@ -19,7 +19,6 @@ export interface CardProps {
 export interface CardState {
   faceUp: boolean;
   position: { x: number; y: number; z: number };
-  location: "tableau" | "stock" | "foundation";
 }
 
 export type Card = CardProps & CardState;
@@ -27,7 +26,6 @@ export type CardObserver = (
   cardId: string,
   position: { x: number; y: number; z: number },
   faceUp: boolean,
-  location: "tableau" | "stock" | "foundation",
 ) => void;
 
 export class Game {
@@ -46,7 +44,6 @@ export class Game {
             rank: i,
             faceUp: false,
             position: { x: 0, y: 0, z: 0 },
-            location: "stock",
           });
         }
       });
@@ -61,37 +58,34 @@ export class Game {
     const tableauCards = shuffledDeck.slice(0, 54);
 
     for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 6; j++) {
+      for (let j = 0; j < 1; j++) {
         const cardIndex = i * 6 + j;
         tableauCards[cardIndex].position = {
           x: i,
           y: 1,
           z: j,
         };
-        tableauCards[cardIndex].location = "tableau";
 
-        if (j === 5) tableauCards[cardIndex].faceUp = true;
+        if (j === 0) tableauCards[cardIndex].faceUp = true;
       }
     }
 
     for (let i = 4; i < 10; i++) {
-      for (let j = 0; j < 5; j++) {
+      for (let j = 0; j < 1; j++) {
         const cardIndex = 24 + (i - 4) * 5 + j;
         tableauCards[cardIndex].position = {
           x: i,
           y: 1,
           z: j,
         };
-        tableauCards[cardIndex].location = "tableau";
 
-        if (j === 4) tableauCards[cardIndex].faceUp = true;
+        if (j === 0) tableauCards[cardIndex].faceUp = true;
       }
     }
 
     const stock = shuffledDeck.slice(54);
     stock.forEach((card) => {
       card.position = { x: 0, y: 0, z: 0 };
-      card.location = "stock";
       card.faceUp = false;
     });
 
@@ -106,7 +100,7 @@ export class Game {
     this.observers.push(o);
 
     this.cards.forEach((card) => {
-      o && o(card.id, card.position, card.faceUp, card.location);
+      o && o(card.id, card.position, card.faceUp);
     });
 
     return () => {
@@ -117,15 +111,19 @@ export class Game {
   private emitChange(cardId: string): void {
     const card = this.cards.find((c) => c.id === cardId);
     if (card) {
-      this.observers.forEach(
-        (o) => o && o(cardId, card.position, card.faceUp, card.location),
-      );
+      this.observers.forEach((o) => o && o(cardId, card.position, card.faceUp));
     }
   }
 
   public canMoveCard(card: Card, toX: number, toY: number): boolean {
-    // draglenen yerde card var mi diye bak
+    // eger dragledigimiz yer tableau ve bossa return true
     // eger dragledigimiz card'in ranki targetCard'inkinden 1 buyuk degilse return false
+
+    const hasCardInArea = this.cards.some(
+      (c) => c.position.x === toX && c.position.y === toY,
+    );
+
+    if (!hasCardInArea) return true;
 
     const targetCard = this.cards
       .filter((c) => c.position.x === toX && c.position.y === toY)
@@ -138,7 +136,7 @@ export class Game {
     return true;
   }
 
-  public canMoveStack(card: Card, toX: number, toY: number): boolean {
+  public canMoveStack(card: Card): boolean {
     // canMoveCard check ettikten sonra:
     // eger stackteki tum cardlarin suiti ayni degilse return false
     const cards = this.cards.filter(
@@ -166,47 +164,47 @@ export class Game {
     );
 
     if (isNotTopCard) {
-      this.canMoveStack(card, toX, toY) && this.moveStack(card, toX, toY);
-    } else {
-      // move ettigimiz stack'in en ustteki karti
-      const targetCardZ = this.cards
-        .filter((c) => c.position.x === toX && c.position.y === toY)
-        .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), 0);
+      this.moveStack(card, toX, toY);
+      return;
+    }
 
-      const newTopCard = this.cards.find(
-        (c) =>
-          c.position.x === card.position.x &&
-          c.position.y === card.position.y &&
-          c.position.z === card.position.z - 1,
-      );
+    // move ettigimiz stack'in en ustteki karti
+    const targetCardZ = this.cards
+      .filter((c) => c.position.x === toX && c.position.y === toY)
+      .reduce((maxZ, c) => (c.position.z > maxZ ? c.position.z : maxZ), -1);
 
-      if (newTopCard) {
-        this.cards = this.cards.map((c) =>
-          c.id === newTopCard.id
-            ? {
-              ...c,
-              faceUp: true,
-            }
-            : c,
-        );
-        this.emitChange(newTopCard.id);
-      }
+    const newTopCard = this.cards.find(
+      (c) =>
+        c.position.x === card.position.x &&
+        c.position.y === card.position.y &&
+        c.position.z === card.position.z - 1,
+    );
 
+    if (newTopCard) {
       this.cards = this.cards.map((c) =>
-        c.id === cardId
+        c.id === newTopCard.id
           ? {
             ...c,
-            position: { x: toX, y: toY, z: targetCardZ + 1 },
+            faceUp: true,
           }
           : c,
       );
-      this.emitChange(cardId);
+      this.emitChange(newTopCard.id);
     }
+
+    this.cards = this.cards.map((c) =>
+      c.id === cardId
+        ? {
+          ...c,
+          position: { x: toX, y: toY, z: targetCardZ + 1 },
+        }
+        : c,
+    );
+
+    this.emitChange(cardId);
   }
 
   public moveStack(card: Card, toX: number, toY: number): void {
-    if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
-
     const cardsToMove = this.cards.filter(
       (c) =>
         c.position.x === card.position.x &&
@@ -285,7 +283,6 @@ export class Game {
           ? {
             ...card,
             position: { x: i, y: 1, z: zIndex },
-            location: "tableau",
             faceUp: true,
           }
           : card,

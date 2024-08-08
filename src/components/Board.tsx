@@ -14,10 +14,10 @@ export default function Board({ game }: BoardProps) {
   const [cards, setCards] = useState(game.cards);
 
   useEffect(() => {
-    const unsubscribe = game.observe((cardId, position, faceUp, location) => {
+    const unsubscribe = game.observe((cardId, position, faceUp) => {
       setCards((cards) =>
         cards.map((card) =>
-          card.id === cardId ? { ...card, position, faceUp, location } : card,
+          card.id === cardId ? { ...card, position, faceUp } : card,
         ),
       );
     });
