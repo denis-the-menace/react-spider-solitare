@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes, Card as CardType } from "./Game";
 import Card from "./Card";
@@ -12,34 +12,50 @@ export default function CardStack({ cards }: CardStackProps) {
     return null;
   }
 
+  const [draggedCardIds, setDraggedCardIds] = useState<string[]>([]);
+
+  const handleCardMouseDown = (clickedCardId: string) => {
+    const clickedCard = cards.find((card) => card.id === clickedCardId);
+    if (!clickedCard) return;
+    const newDraggedCardIds = cards
+      .filter((card) => card.position.z >= clickedCard.position.z)
+      .map((card) => card.id);
+
+    setDraggedCardIds(newDraggedCardIds);
+  };
+
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: ItemTypes.CARD,
-      item: { id: cards[0]?.id || "", cards },
+      item: { draggedCardIds },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [cards],
+    [draggedCardIds],
   );
 
-  console.log(cards);
-
   const renderCards = (card: CardType) => {
-    return <Card key={card.id} card={card} isDragging={isDragging} />;
+    return (
+      <Card key={card.id} card={card} onCardMouseDown={handleCardMouseDown} />
+    );
   };
 
-  let cardElements = null;
-  if (cards) {
-    cardElements = cards.map(renderCards);
-  }
+  const draggedCards = cards.filter((card) =>
+    draggedCardIds.some((draggedCardId) => draggedCardId === card.id),
+  );
+  const remainingCards = cards.slice(0, cards.length - draggedCards.length);
+  const cardElements = remainingCards.map(renderCards);
+  const draggedCardElements = draggedCards.map(renderCards);
+
+  //farkli yerlerden tiklayinca hata veriyor
 
   return (
-    <div
-      ref={drag}
-      className={`relative ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-    >
-      {cardElements}
-    </div>
+    <>
+      <div className="relative">{cardElements}</div>
+      <div ref={drag} className="relative">
+        {draggedCardElements}
+      </div>
+    </>
   );
 }

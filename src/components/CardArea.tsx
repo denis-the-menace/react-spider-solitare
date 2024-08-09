@@ -21,8 +21,11 @@ export default function CardArea({
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ItemTypes.CARD,
-      drop: (item: { id: string }) => {
-        game.moveCard(item.id, x, y);
+      drop: (item: { draggedCardIds: string[] }) => {
+        console.log(item.draggedCardIds.length === 1 && "yes");
+        item.draggedCardIds.length === 1
+          ? game.moveCard(item.draggedCardIds[0], x, y)
+          : game.moveStack(item.draggedCardIds, x, y);
       },
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),

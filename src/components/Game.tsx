@@ -58,7 +58,7 @@ export class Game {
     const tableauCards = shuffledDeck.slice(0, 54);
 
     for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 1; j++) {
+      for (let j = 0; j < 6; j++) {
         const cardIndex = i * 6 + j;
         tableauCards[cardIndex].position = {
           x: i,
@@ -66,12 +66,12 @@ export class Game {
           z: j,
         };
 
-        if (j === 0) tableauCards[cardIndex].faceUp = true;
+        if (j === 5) tableauCards[cardIndex].faceUp = true;
       }
     }
 
     for (let i = 4; i < 10; i++) {
-      for (let j = 0; j < 1; j++) {
+      for (let j = 0; j < 5; j++) {
         const cardIndex = 24 + (i - 4) * 5 + j;
         tableauCards[cardIndex].position = {
           x: i,
@@ -79,7 +79,7 @@ export class Game {
           z: j,
         };
 
-        if (j === 0) tableauCards[cardIndex].faceUp = true;
+        if (j === 4) tableauCards[cardIndex].faceUp = true;
       }
     }
 
@@ -136,15 +136,9 @@ export class Game {
     return true;
   }
 
-  public canMoveStack(card: Card): boolean {
+  public canMoveStack(cards: Card[]): boolean {
     // canMoveCard check ettikten sonra:
     // eger stackteki tum cardlarin suiti ayni degilse return false
-    const cards = this.cards.filter(
-      (c) =>
-        c.position.x === card.position.x &&
-        c.position.y === card.position.y &&
-        c.position.z >= card.position.z,
-    );
 
     const isSameSuit = cards.every((card) => card.suit === cards[0].suit);
     if (!isSameSuit) return false;
@@ -155,18 +149,6 @@ export class Game {
   public moveCard(cardId: string, toX: number, toY: number): void {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
-
-    const isNotTopCard = this.cards.some(
-      (c) =>
-        c.position.x === card.position.x &&
-        c.position.y === card.position.y &&
-        c.position.z === card.position.z + 1,
-    );
-
-    if (isNotTopCard) {
-      this.moveStack(card, toX, toY);
-      return;
-    }
 
     // move ettigimiz stack'in en ustteki karti
     const targetCardZ = this.cards
@@ -184,9 +166,9 @@ export class Game {
       this.cards = this.cards.map((c) =>
         c.id === newTopCard.id
           ? {
-            ...c,
-            faceUp: true,
-          }
+              ...c,
+              faceUp: true,
+            }
           : c,
       );
       this.emitChange(newTopCard.id);
@@ -195,24 +177,30 @@ export class Game {
     this.cards = this.cards.map((c) =>
       c.id === cardId
         ? {
-          ...c,
-          position: { x: toX, y: toY, z: targetCardZ + 1 },
-        }
+            ...c,
+            position: { x: toX, y: toY, z: targetCardZ + 1 },
+          }
         : c,
     );
 
     this.emitChange(cardId);
   }
 
-  public moveStack(card: Card, toX: number, toY: number): void {
-    const cardsToMove = this.cards.filter(
-      (c) =>
-        c.position.x === card.position.x &&
-        c.position.y === card.position.y &&
-        c.position.z >= card.position.z,
+  public moveStack(cardIds: string[], toX: number, toY: number): void {
+    const undefinedCards = cardIds.map((id) =>
+      this.cards.find((c) => c.id === id),
     );
+    if (undefinedCards.some((c) => !c)) return;
+    const cards = undefinedCards as Card[];
 
-    const updatedCardsToMove = cardsToMove
+    if (
+      !cards[0].faceUp ||
+      !this.canMoveCard(cards[0], toX, toY) ||
+      !this.canMoveStack(cards)
+    )
+      return;
+
+    const updatedCardsToMove = cards
       .sort((a, b) => a.position.z - b.position.z)
       .map((c, index) => ({
         ...c,
@@ -230,18 +218,18 @@ export class Game {
 
     const newTopCard = this.cards.find(
       (c) =>
-        c.position.x === card.position.x &&
-        c.position.y === card.position.y &&
-        c.position.z === card.position.z - 1,
+        c.position.x === cards[0].position.x &&
+        c.position.y === cards[0].position.y &&
+        c.position.z === cards[0].position.z - 1,
     );
 
     if (newTopCard) {
       this.cards = this.cards.map((c) =>
         c.id === newTopCard.id
           ? {
-            ...c,
-            faceUp: true,
-          }
+              ...c,
+              faceUp: true,
+            }
           : c,
       );
       this.emitChange(newTopCard.id);
@@ -281,10 +269,10 @@ export class Game {
       this.cards = this.cards.map((card) =>
         card.id === topCard.id
           ? {
-            ...card,
-            position: { x: i, y: 1, z: zIndex },
-            faceUp: true,
-          }
+              ...card,
+              position: { x: i, y: 1, z: zIndex },
+              faceUp: true,
+            }
           : card,
       );
 
