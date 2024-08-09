@@ -7,7 +7,6 @@ interface CardProps {
 
 export default function Card({ card, onCardMouseDown }: CardProps) {
   const handleCardMouseDown = () => {
-    console.log(card.position.z);
     card.faceUp ? onCardMouseDown(card.id) : null;
   };
 

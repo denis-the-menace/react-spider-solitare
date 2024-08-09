@@ -46,9 +46,11 @@ export default function CardStack({ cards }: CardStackProps) {
   );
   const remainingCards = cards.slice(0, cards.length - draggedCards.length);
   const cardElements = remainingCards.map(renderCards);
+  // console.log(cardElements);
   const draggedCardElements = draggedCards.map(renderCards);
 
   //farkli yerlerden tiklayinca hata veriyor
+  //eger cardstacke birakirsan hata veriyor carda birakirsan sikinti yok
 
   return (
     <>

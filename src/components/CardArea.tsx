@@ -22,7 +22,6 @@ export default function CardArea({
     () => ({
       accept: ItemTypes.CARD,
       drop: (item: { draggedCardIds: string[] }) => {
-        console.log(item.draggedCardIds.length === 1 && "yes");
         item.draggedCardIds.length === 1
           ? game.moveCard(item.draggedCardIds[0], x, y)
           : game.moveStack(item.draggedCardIds, x, y);
@@ -37,7 +36,7 @@ export default function CardArea({
   return (
     <div
       ref={drop}
-      className={`w-32 h-48 flex items-center justify-center relative ${
+      className={`w-32 h-48 relative ${
         isOver ? "bg-lightblue" : "bg-transparent"
       } transition-colors duration-300 border border-gray-300 shadow-md`}
       style={{

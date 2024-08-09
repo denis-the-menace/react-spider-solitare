@@ -147,6 +147,7 @@ export class Game {
   }
 
   public moveCard(cardId: string, toX: number, toY: number): void {
+    console.log(cardId);
     const card = this.cards.find((c) => c.id === cardId);
     if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
 
@@ -187,6 +188,7 @@ export class Game {
   }
 
   public moveStack(cardIds: string[], toX: number, toY: number): void {
+    console.log(cardIds);
     const undefinedCards = cardIds.map((id) =>
       this.cards.find((c) => c.id === id),
     );
@@ -248,6 +250,8 @@ export class Game {
       }
       return c;
     });
+
+    console.log(cards.filter((c) => c.position.x === cards[0].position.x));
 
     updatedCardsToMove.forEach((card) => {
       this.emitChange(card.id);
