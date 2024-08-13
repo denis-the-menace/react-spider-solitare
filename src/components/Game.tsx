@@ -31,6 +31,13 @@ export type CardObserver = (
 export class Game {
   public cards: Card[] = [];
   private observers: CardObserver[] = [];
+  private foundationsCompleted: number = 0;
+  private history: Card[][] = [];
+
+  public newGame(): void {
+    this.history = [];
+    // ... reset game state ...
+  }
 
   constructor() {
     const generateDeck = (deckNo: number) => {
@@ -115,7 +122,23 @@ export class Game {
     }
   }
 
-  public canMoveCard(card: Card, toX: number, toY: number): boolean {
+  private saveState() {
+    this.history.push(JSON.parse(JSON.stringify(this.cards)));
+    console.log(this.history);
+  }
+
+  public undo(): boolean {
+    if (this.history.length === 0) {
+      return false;
+    }
+
+    console.log(this.history.pop()!);
+    this.cards = this.history.pop()!;
+    this.cards.forEach((card) => this.emitChange(card.id));
+    return true;
+  }
+
+  private canMoveCard(card: Card, toX: number, toY: number): boolean {
     // eger dragledigimiz yer tableau ve bossa return true
     // eger dragledigimiz card'in ranki targetCard'inkinden 1 buyuk degilse return false
 
@@ -136,7 +159,7 @@ export class Game {
     return true;
   }
 
-  public canMoveStack(cards: Card[]): boolean {
+  private canMoveStack(cards: Card[]): boolean {
     // canMoveCard check ettikten sonra:
     // eger stackteki tum cardlarin suiti ayni degilse return false
 
@@ -146,12 +169,29 @@ export class Game {
     return true;
   }
 
+  private checkStackComplete(stack: Card[]): void {
+    if (stack.length !== 13) return;
+
+    stack.forEach((card, index) => {
+      this.cards = this.cards.map((c) =>
+        c.id === card.id
+          ? {
+            ...c,
+            position: { x: this.foundationsCompleted + 1, y: 0, z: index },
+          }
+          : c,
+      );
+      this.emitChange(card.id);
+    });
+
+    this.foundationsCompleted++;
+  }
+
   public moveCard(cardId: string, toX: number, toY: number): void {
-    console.log(cardId, toX, toY)
     const card = this.cards.find((c) => c.id === cardId);
     if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
 
-    if(card.position.x === toX && card.position.y === toY) return;
+    if (card.position.x === toX && card.position.y === toY) return;
 
     // move ettigimiz stack'in en ustteki karti
     const targetCardZ = this.cards
@@ -169,9 +209,9 @@ export class Game {
       this.cards = this.cards.map((c) =>
         c.id === newTopCard.id
           ? {
-              ...c,
-              faceUp: true,
-            }
+            ...c,
+            faceUp: true,
+          }
           : c,
       );
       this.emitChange(newTopCard.id);
@@ -180,17 +220,23 @@ export class Game {
     this.cards = this.cards.map((c) =>
       c.id === cardId
         ? {
-            ...c,
-            position: { x: toX, y: toY, z: targetCardZ + 1 },
-          }
+          ...c,
+          position: { x: toX, y: toY, z: targetCardZ + 1 },
+        }
         : c,
     );
 
     this.emitChange(cardId);
+
+    const stack = this.cards.filter(
+      (c) => c.position.x === toX && c.position.y === toY && c.faceUp,
+    );
+
+    this.checkStackComplete(stack);
+    this.saveState();
   }
 
   public moveStack(cardIds: string[], toX: number, toY: number): void {
-    console.log(cardIds, toX, toY)
     const undefinedCards = cardIds.map((id) =>
       this.cards.find((c) => c.id === id),
     );
@@ -198,7 +244,6 @@ export class Game {
     const cards = undefinedCards as Card[];
 
     cards.sort((a, b) => a.position.z - b.position.z);
-    console.log(cards)
 
     if (
       !cards[0].faceUp ||
@@ -234,9 +279,9 @@ export class Game {
       this.cards = this.cards.map((c) =>
         c.id === newTopCard.id
           ? {
-              ...c,
-              faceUp: true,
-            }
+            ...c,
+            faceUp: true,
+          }
           : c,
       );
       this.emitChange(newTopCard.id);
@@ -259,6 +304,10 @@ export class Game {
     updatedCardsToMove.forEach((card) => {
       this.emitChange(card.id);
     });
+
+    this.checkStackComplete(updatedCardsToMove);
+
+    this.saveState();
   }
 
   public dealStockCards(stock: Card[]): void {
@@ -276,15 +325,17 @@ export class Game {
       this.cards = this.cards.map((card) =>
         card.id === topCard.id
           ? {
-              ...card,
-              position: { x: i, y: 1, z: zIndex },
-              faceUp: true,
-            }
+            ...card,
+            position: { x: i, y: 1, z: zIndex },
+            faceUp: true,
+          }
           : card,
       );
 
       this.emitChange(topCard.id);
     }
+
+    this.saveState();
   }
 
   public getCard(cardId: string): Card | undefined {

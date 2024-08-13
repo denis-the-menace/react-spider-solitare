@@ -2,13 +2,13 @@ import { Card as CardType } from "./Game";
 
 interface CardProps {
   card: CardType;
-  onCardMouseDown?: (clickedCardId: string) => void;
+  onCardMouseDown?: (clickedCardId: string, event: React.MouseEvent) => void;
 }
 
 export default function Card({ card, onCardMouseDown }: CardProps) {
-  const handleCardMouseDown = () => {
+  const handleCardMouseDown = (event: React.MouseEvent) => {
     if (!onCardMouseDown) return;
-    card.faceUp ? onCardMouseDown(card.id) : null;
+    card.faceUp || card.id === "0" ? onCardMouseDown(card.id, event) : null;
   };
 
   return (
@@ -16,10 +16,8 @@ export default function Card({ card, onCardMouseDown }: CardProps) {
       className={`border-black border-2 border-x-[5px] rounded-lg absolute w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] select-none ${card.faceUp && "cursor-grab"}`}
       style={{
         zIndex: card.position.z,
-        top:
-          card.position.x === 0 && card.position.y === 0
-            ? ""
-            : `${card.position.z * 32}px`,
+        top: card.position.y === 0 ? "" : `${card.position.z * 32}px`,
+        transition: "top 0.5s ease, left 0.5s ease",
       }}
       onMouseDown={handleCardMouseDown}
     >

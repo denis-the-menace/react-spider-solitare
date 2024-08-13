@@ -1,4 +1,3 @@
-// DragLayer.tsx
 import { useDragLayer } from "react-dnd";
 import { ItemTypes, Game } from "./Game";
 import Card from "./Card";
@@ -35,7 +34,6 @@ export function DragLayer({ game }: DragLayerProps) {
         <Card
           key={cardId}
           card={game.getCard(cardId)}
-          isDragging={false} // This ensures the card is visible in the drag layer
         />
       ))}
     </div>

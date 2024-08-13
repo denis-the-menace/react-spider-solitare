@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes, Card as CardType } from "./Game";
 import Card from "./Card";
@@ -9,30 +9,37 @@ interface CardStackProps {
 
 export default function CardStack({ cards }: CardStackProps) {
   const [draggedCardIds, setDraggedCardIds] = useState<string[]>([]);
+  const mouseOffsetRef = useRef({ x: 0, y: 0 });
 
-  if (!cards) {
-    return null;
-  }
-
-  const handleCardMouseDown = (clickedCardId: string) => {
+  const handleCardMouseDown = (
+    clickedCardId: string,
+    event: React.MouseEvent,
+  ) => {
     const clickedCard = cards.find((card) => card.id === clickedCardId);
     if (!clickedCard) return;
+
     const newDraggedCardIds = cards
       .filter((card) => card.position.z >= clickedCard.position.z)
       .map((card) => card.id);
 
     setDraggedCardIds(newDraggedCardIds);
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    mouseOffsetRef.current = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
   };
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: ItemTypes.CARD,
-      item: { draggedCardIds },
+      item: { draggedCardIds, mouseOffset: mouseOffsetRef.current, cards },
       collect: (monitor) => ({
         isDragging: !!monitor.isDragging(),
       }),
     }),
-    [draggedCardIds],
+    [draggedCardIds, cards],
   );
 
   const renderCards = (card: CardType) => (
@@ -48,7 +55,7 @@ export default function CardStack({ cards }: CardStackProps) {
   return (
     <>
       <div className="relative">{remainingCards.map(renderCards)}</div>
-      <div ref={drag} draggable="true" className={`relative ${isDragging && "opacity-0"}`}>
+      <div ref={drag} className={`relative ${isDragging && "opacity-0"}`}>
         {draggedCards.map(renderCards)}
       </div>
     </>

@@ -15,8 +15,6 @@ export default function Foundation({ cards, game }: FoundationProps) {
       (card) => card.position.x === x && card.position.y === y,
     );
 
-    console.log(foundation);
-
     return (
       <FoundationCardArea
         key={`foundation-${x}-${y}`}

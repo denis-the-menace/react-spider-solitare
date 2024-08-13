@@ -25,8 +25,14 @@ export default function Board({ game }: BoardProps) {
     return unsubscribe;
   }, [game]);
 
+  const handleUndo = () => {
+    game.undo();
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
+      <button onClick={handleUndo}>Undo</button>
+      {/*<DragLayer game={game} />*/}
       <div className="grid grid-cols-10 grid-rows-2 gap-8 w-full h-full">
         <div className="col-span-1 row-span-1">
           <Stock cards={cards} game={game} />

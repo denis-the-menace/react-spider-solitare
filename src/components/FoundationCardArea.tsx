@@ -18,11 +18,12 @@ export default function FoundationCardArea({
 
   return (
     <div
-      className={`border-black border-2 border-x-4 rounded-lg w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] flex items-center justify-center relative 
+      className={`border-black border-2 border-x-4 rounded-lg w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem]
+        lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] flex items-center justify-center relative 
         transition-colors duration-300`}
       style={{
         gridColumnStart: x + 1,
-        gridRowStart: y + 1,
+        gridRowStart: y,
       }}
     >
       {cards.length ? (

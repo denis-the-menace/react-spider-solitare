@@ -22,7 +22,6 @@ export default function CardArea({
     () => ({
       accept: ItemTypes.CARD,
       drop: (item: { draggedCardIds: string[] }) => {
-        console.log(item.draggedCardIds);
         item.draggedCardIds.length === 1
           ? game.moveCard(item.draggedCardIds[0], x, y)
           : game.moveStack(item.draggedCardIds, x, y);
