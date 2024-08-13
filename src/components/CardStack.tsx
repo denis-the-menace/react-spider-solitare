@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes, Card as CardType } from "./Game";
 import Card from "./Card";
@@ -9,16 +9,7 @@ interface CardStackProps {
 
 export default function CardStack({ cards }: CardStackProps) {
   const [draggedCardIds, setDraggedCardIds] = useState<string[]>([]);
-  // const [, forceUpdate] = useState({});
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     forceUpdate({});
-  //   }, 3000);
-  //
-  //   return () => clearInterval(interval);
-  // }, []);
-  //
   if (!cards) {
     return null;
   }
@@ -57,10 +48,7 @@ export default function CardStack({ cards }: CardStackProps) {
   return (
     <>
       <div className="relative">{remainingCards.map(renderCards)}</div>
-      <div
-        ref={drag}
-        className={`relative ${isDragging && "opacity-0"}`}
-      >
+      <div ref={drag} draggable="true" className={`relative ${isDragging && "opacity-0"}`}>
         {draggedCards.map(renderCards)}
       </div>
     </>

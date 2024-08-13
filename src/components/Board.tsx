@@ -5,6 +5,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Game } from "./Game";
 import { useState, useEffect } from "react";
+import { DragLayer } from "./DragLayer";
 
 interface BoardProps {
   game: Game;

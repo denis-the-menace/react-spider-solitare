@@ -22,6 +22,7 @@ export default function CardArea({
     () => ({
       accept: ItemTypes.CARD,
       drop: (item: { draggedCardIds: string[] }) => {
+        console.log(item.draggedCardIds);
         item.draggedCardIds.length === 1
           ? game.moveCard(item.draggedCardIds[0], x, y)
           : game.moveStack(item.draggedCardIds, x, y);
@@ -36,9 +37,9 @@ export default function CardArea({
   return (
     <div
       ref={drop}
-      className={`w-32 h-48 relative ${
+      className={`w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] relative ${
         isOver ? "bg-lightblue" : "bg-transparent"
-      } transition-colors duration-300 border border-gray-300 shadow-md`}
+      } transition-colors duration-300`}
       style={{
         gridColumnStart: x + 1,
         gridRowStart: y + 1,

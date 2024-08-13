@@ -24,7 +24,7 @@ export default function GameScreen({
   const game = useMemo(() => new Game(), []);
 
   return (
-    <div className="bg-green-700 w-full">
+    <div className="w-full">
       <div style={{ position: "relative" }}>
         <Board game={game} />
       </div>

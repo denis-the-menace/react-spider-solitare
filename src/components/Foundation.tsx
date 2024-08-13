@@ -11,11 +11,18 @@ export default function Foundation({ cards, game }: FoundationProps) {
     const x = i + 1;
     const y = 0;
 
+    const foundation = cards.filter(
+      (card) => card.position.x === x && card.position.y === y,
+    );
+
+    console.log(foundation);
+
     return (
       <FoundationCardArea
         key={`foundation-${x}-${y}`}
         x={x}
         y={y}
+        cards={foundation}
         game={game}
       ></FoundationCardArea>
     );

@@ -1,49 +1,45 @@
-import type { ReactNode } from "react";
-import { ItemTypes, Game } from "./Game";
-import { useDrop } from "react-dnd";
+import Card from "./Card";
+import { Game, Card as CardType } from "./Game";
 
 interface FoundationCardAreaProps {
   x: number;
   y: number;
-  children?: ReactNode;
+  cards: CardType[];
   game: Game;
 }
 
 export default function FoundationCardArea({
   x,
   y,
-  children,
+  cards,
   game,
 }: FoundationCardAreaProps) {
-  const [{ isOver }, drop] = useDrop(
-    () => ({
-      accept: ItemTypes.CARD,
-      drop: (item: { id: string }) => {
-        game.moveCard(item.id, x, y);
-      },
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-      }),
-    }),
-    [game],
-  );
+  if (!cards) return null;
 
   return (
     <div
-      ref={drop}
-      className={`w-32 h-48 flex items-center justify-center relative ${isOver ? "bg-lightblue" : "bg-gray-900"
-        } transition-colors duration-300 border border-gray-300 shadow-md`}
+      className={`border-black border-2 border-x-4 rounded-lg w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] flex items-center justify-center relative 
+        transition-colors duration-300`}
       style={{
         gridColumnStart: x + 1,
         gridRowStart: y + 1,
       }}
     >
-      {children ? (
-        children
+      {cards.length ? (
+        <Card
+          card={cards.reduce((highestZCard, currentCard) => {
+            return currentCard.position.z > highestZCard.position.z
+              ? currentCard
+              : highestZCard;
+          }, cards[0])}
+        />
       ) : (
-        <p className="text-3xl text-white">
-          {x === 1 ? "♠" : x === 2 ? "♣" : x === 3 ? "♦" : "♥"}
-        </p>
+        <img
+          src="cards/back1.png"
+          alt="back"
+          className="brightness-75 w-full h-full object-cover pointer-events-none"
+          draggable={false}
+        />
       )}
     </div>
   );

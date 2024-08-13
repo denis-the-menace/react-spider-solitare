@@ -17,18 +17,15 @@ export default function Stock({ cards, game }: StockProps) {
   };
 
   return (
-    <div className="ml-3">
+    <div className="mt-1 lg:mt-2 lg:ml-3">
       <CardArea
         key={`${0}-${0}`}
         x={0}
         y={0}
+        cards={stock}
         game={game}
         onClick={handleLeftClick}
-      >
-        {stock.map((card) => (
-          <Card key={card.id} card={card} />
-        ))}
-      </CardArea>
+      ></CardArea>
     </div>
   );
 }
