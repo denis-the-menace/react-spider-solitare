@@ -4,6 +4,7 @@ import { Game } from "../components/Game";
 import Board from "../components/Board";
 
 interface GameScreenProps {
+  startGame: (suits: number) => void;
   gamePaused: boolean;
   pauseGame: () => void;
   continueGame: () => void;
@@ -11,6 +12,7 @@ interface GameScreenProps {
 }
 
 export default function GameScreen({
+  startGame,
   gamePaused,
   pauseGame,
   continueGame,
@@ -21,7 +23,7 @@ export default function GameScreen({
     continueGame();
   };
 
-  const game = useMemo(() => new Game(), []);
+  const game = useMemo(() => new Game(startGame), []);
 
   return (
     <div className="w-full">

@@ -1,6 +1,5 @@
 import { Card as CardType, Game } from "./Game";
 import CardArea from "./CardArea";
-import Card from "./Card";
 
 interface StockProps {
   cards: CardType[];
@@ -20,6 +19,7 @@ export default function Stock({ cards, game }: StockProps) {
     const noOfEmptyCards = Math.ceil(stock.length / 10); // This determines how many empty cards to render
     return Array.from({ length: noOfEmptyCards }, (_, index) => (
       <div
+        key={`empty-${index}`}
         className={`lg:ml-3 border-black border-2 border-x-[5px] rounded-lg absolute w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] select-none cursor-pointer`}
         style={{
           zIndex: index,

@@ -39,6 +39,7 @@ export default function App() {
         >
           {true ? (
             <GameScreen
+              startGame={startGame}
               gamePaused={gamePaused}
               pauseGame={pauseGame}
               continueGame={continueGame}

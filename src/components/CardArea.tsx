@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { ItemTypes, Game, Card as CardType } from "./Game";
 import { useDrop } from "react-dnd";
 import CardStack from "./CardStack";
