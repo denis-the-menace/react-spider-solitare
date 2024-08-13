@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { ItemTypes, Card as CardType } from "./Game";
 import Card from "./Card";
@@ -8,11 +8,20 @@ interface CardStackProps {
 }
 
 export default function CardStack({ cards }: CardStackProps) {
+  const [draggedCardIds, setDraggedCardIds] = useState<string[]>([]);
+  // const [, forceUpdate] = useState({});
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     forceUpdate({});
+  //   }, 3000);
+  //
+  //   return () => clearInterval(interval);
+  // }, []);
+  //
   if (!cards) {
     return null;
   }
-
-  const [draggedCardIds, setDraggedCardIds] = useState<string[]>([]);
 
   const handleCardMouseDown = (clickedCardId: string) => {
     const clickedCard = cards.find((card) => card.id === clickedCardId);
@@ -35,28 +44,24 @@ export default function CardStack({ cards }: CardStackProps) {
     [draggedCardIds],
   );
 
-  const renderCards = (card: CardType) => {
-    return (
-      <Card key={card.id} card={card} onCardMouseDown={handleCardMouseDown} />
-    );
-  };
-
-  const draggedCards = cards.filter((card) =>
-    draggedCardIds.some((draggedCardId) => draggedCardId === card.id),
+  const renderCards = (card: CardType) => (
+    <Card key={card.id} card={card} onCardMouseDown={handleCardMouseDown} />
   );
-  const remainingCards = cards.slice(0, cards.length - draggedCards.length);
-  const cardElements = remainingCards.map(renderCards);
-  // console.log(cardElements);
-  const draggedCardElements = draggedCards.map(renderCards);
 
-  //farkli yerlerden tiklayinca hata veriyor
-  //eger cardstacke birakirsan hata veriyor carda birakirsan sikinti yok
+  const draggedCards = cards.filter((card) => draggedCardIds.includes(card.id));
+
+  const remainingCards = cards.filter(
+    (card) => !draggedCardIds.includes(card.id),
+  );
 
   return (
     <>
-      <div className="relative">{cardElements}</div>
-      <div ref={drag} className="relative">
-        {draggedCardElements}
+      <div className="relative">{remainingCards.map(renderCards)}</div>
+      <div
+        ref={drag}
+        className={`relative ${isDragging && "opacity-0"}`}
+      >
+        {draggedCards.map(renderCards)}
       </div>
     </>
   );

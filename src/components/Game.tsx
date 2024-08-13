@@ -147,9 +147,10 @@ export class Game {
   }
 
   public moveCard(cardId: string, toX: number, toY: number): void {
-    console.log(cardId);
     const card = this.cards.find((c) => c.id === cardId);
     if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
+
+    if(card.position.x === toX && card.position.y === toY) return;
 
     // move ettigimiz stack'in en ustteki karti
     const targetCardZ = this.cards
@@ -188,7 +189,6 @@ export class Game {
   }
 
   public moveStack(cardIds: string[], toX: number, toY: number): void {
-    console.log(cardIds);
     const undefinedCards = cardIds.map((id) =>
       this.cards.find((c) => c.id === id),
     );
@@ -250,8 +250,6 @@ export class Game {
       }
       return c;
     });
-
-    console.log(cards.filter((c) => c.position.x === cards[0].position.x));
 
     updatedCardsToMove.forEach((card) => {
       this.emitChange(card.id);
