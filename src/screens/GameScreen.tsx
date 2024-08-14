@@ -4,31 +4,32 @@ import { Game } from "../components/Game";
 import Board from "../components/Board";
 
 interface GameScreenProps {
-  startGame: (suits: number) => void;
+  numSuits: number | null;
   gamePaused: boolean;
   pauseGame: () => void;
   continueGame: () => void;
   exitGame: () => void;
+  setHandleUndo: (handleUndo: () => void) => void;
 }
 
 export default function GameScreen({
-  startGame,
+  numSuits,
   gamePaused,
-  pauseGame,
   continueGame,
   exitGame,
+  setHandleUndo,
 }: GameScreenProps) {
   const handleExit = () => {
     exitGame();
     continueGame();
   };
 
-  const game = useMemo(() => new Game(startGame), []);
+  const game = useMemo(() => new Game(numSuits ?? 1), [numSuits]);
 
   return (
     <div className="w-full">
       <div style={{ position: "relative" }}>
-        <Board game={game} />
+        <Board game={game} setHandleUndo={setHandleUndo} />
       </div>
 
       {gamePaused && (

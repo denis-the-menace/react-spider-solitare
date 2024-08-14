@@ -16,7 +16,7 @@ export default function Stock({ cards, game }: StockProps) {
   };
 
   const renderEmptyCards = () => {
-    const noOfEmptyCards = Math.ceil(stock.length / 10); // This determines how many empty cards to render
+    const noOfEmptyCards = Math.ceil(stock.length / 10);
     return Array.from({ length: noOfEmptyCards }, (_, index) => (
       <div
         key={`empty-${index}`}
@@ -39,7 +39,7 @@ export default function Stock({ cards, game }: StockProps) {
   };
 
   return (
-    <div className="mt-1 lg:mt-2 lg:ml-3">
+    <div className="mt-1 lg:mt-2 2xl:ml-3">
       {renderEmptyCards()}
       <CardArea
         key={`${0}-${0}`}

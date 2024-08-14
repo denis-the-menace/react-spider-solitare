@@ -2,17 +2,26 @@ import Tableau from "./Tableau";
 import Stock from "./Stock";
 import Foundation from "./Foundation";
 import { DndProvider } from "react-dnd";
+import { BackendFactory } from "dnd-core";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { TouchBackend } from "react-dnd-touch-backend";
 import { Game } from "./Game";
 import { useState, useEffect } from "react";
 import { DragLayer } from "./DragLayer";
 
 interface BoardProps {
   game: Game;
+  setHandleUndo: (handleUndo: () => void) => void;
 }
 
-export default function Board({ game }: BoardProps) {
+export default function Board({ game, setHandleUndo }: BoardProps) {
   const [cards, setCards] = useState(game.cards);
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
+  const backend = isMobile ? TouchBackend : HTML5Backend;
+
+  if (!backend) {
+    return null;
+  }
 
   useEffect(() => {
     const unsubscribe = game.observe((cardId, position, faceUp) => {
@@ -25,14 +34,17 @@ export default function Board({ game }: BoardProps) {
     return unsubscribe;
   }, [game]);
 
+  useEffect(() => {
+    setHandleUndo(() => handleUndo);
+  }, [setHandleUndo]);
+
   const handleUndo = () => {
     game.undo();
-  }
+  };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <button onClick={handleUndo}>Undo</button>
-      {/*<DragLayer game={game} />*/}
+    <DndProvider backend={backend}>
+      <DragLayer game={game} />
       <div className="grid grid-cols-10 grid-rows-2 gap-8 w-full h-full">
         <div className="col-span-1 row-span-1">
           <Stock cards={cards} game={game} />

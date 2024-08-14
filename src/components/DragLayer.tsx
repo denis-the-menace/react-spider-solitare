@@ -21,21 +21,21 @@ export function DragLayer({ game }: DragLayerProps) {
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        pointerEvents: "none",
-        zIndex: 100,
-        left: currentOffset?.x ? currentOffset.x - item.mouseOffset.x : 0,
-        top: currentOffset?.y ? currentOffset.y - item.mouseOffset.y : 0,
-      }}
-    >
-      {item.draggedCardIds.map((cardId: string) => (
-        <Card
-          key={cardId}
-          card={game.getCard(cardId)}
-        />
-      ))}
+    <div className="fixed inset-0 pointer-events-none z-50">
+      <div
+        className={`absolute`}
+        style={{
+          left: currentOffset?.x ?? 0,
+          top: currentOffset?.y ?? 0,
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        {item.draggedCardIds.map((cardId: string, index: number) => (
+          <div key={cardId} className={`absolute top-[${index * 32}px] left-0`}>
+            <Card card={game.getCard(cardId)} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
