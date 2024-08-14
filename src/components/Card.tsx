@@ -11,7 +11,6 @@ export default function Card({ card, onCardClick, isDragging }: CardProps) {
 
   const handleCardClick = () => {
     if (!onCardClick) return;
-  console.log(card.id);
     card.faceUp || card.id === "0" ? onCardClick(card.id) : null;
   };
 

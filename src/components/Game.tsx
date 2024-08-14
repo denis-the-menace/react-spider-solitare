@@ -172,24 +172,6 @@ export class Game {
     return true;
   }
 
-  private checkStackComplete(stack: Card[]): void {
-    if (stack.length !== 13) return;
-
-    stack.forEach((card, index) => {
-      this.cards = this.cards.map((c) =>
-        c.id === card.id
-          ? {
-              ...c,
-              position: { x: this.foundationsCompleted + 1, y: 0, z: index },
-            }
-          : c,
-      );
-      this.emitChange(card.id);
-    });
-
-    this.foundationsCompleted++;
-  }
-
   public moveCard(cardId: string, toX: number, toY: number): void {
     const card = this.cards.find((c) => c.id === cardId);
     if (!card || !card.faceUp || !this.canMoveCard(card, toX, toY)) return;
@@ -235,7 +217,30 @@ export class Game {
       (c) => c.position.x === toX && c.position.y === toY && c.faceUp,
     );
 
-    this.checkStackComplete(stack);
+    const isStackComplete = this.checkStackComplete(stack);
+
+    if (isStackComplete) {
+      const cardBelowStack = this.cards.find(
+        (c) =>
+          c.position.x === toX &&
+          c.position.y === toY &&
+          c.position.z === card.position.z - 1,
+      );
+      console.log(cardBelowStack);
+
+      if (cardBelowStack) {
+        this.cards = this.cards.map((c) =>
+          c.id === cardBelowStack.id
+            ? {
+                ...c,
+                faceUp: true,
+              }
+            : c,
+        );
+        this.emitChange(cardBelowStack.id);
+      }
+    }
+
     this.saveState();
   }
 
@@ -308,9 +313,54 @@ export class Game {
       this.emitChange(card.id);
     });
 
-    this.checkStackComplete(updatedCardsToMove);
+    const stack = this.cards.filter(
+      (c) => c.position.x === toX && c.position.y === toY && c.faceUp,
+    );
+
+    const isStackComplete = this.checkStackComplete(stack);
+
+    if (isStackComplete) {
+      const cardBelowStack = this.cards.find(
+        (c) =>
+          c.position.x === toX &&
+          c.position.y === toY &&
+          c.position.z === stack[0].position.z - 1,
+      );
+      console.log(cardBelowStack);
+
+      if (cardBelowStack) {
+        this.cards = this.cards.map((c) =>
+          c.id === cardBelowStack.id
+            ? {
+                ...c,
+                faceUp: true,
+              }
+            : c,
+        );
+        this.emitChange(cardBelowStack.id);
+      }
+    }
 
     this.saveState();
+  }
+
+  private checkStackComplete(stack: Card[]): boolean {
+    if (stack.length !== 13) return false;
+
+    stack.forEach((card, index) => {
+      this.cards = this.cards.map((c) =>
+        c.id === card.id
+          ? {
+              ...c,
+              position: { x: this.foundationsCompleted + 1, y: 0, z: index },
+            }
+          : c,
+      );
+      this.emitChange(card.id);
+    });
+
+    this.foundationsCompleted++;
+    return true;
   }
 
   public dealStockCards(stock: Card[]): void {

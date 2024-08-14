@@ -2,7 +2,6 @@ import Tableau from "./Tableau";
 import Stock from "./Stock";
 import Foundation from "./Foundation";
 import { DndProvider } from "react-dnd";
-import { BackendFactory } from "dnd-core";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
 import { Game } from "./Game";
