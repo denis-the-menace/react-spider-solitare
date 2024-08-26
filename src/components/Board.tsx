@@ -44,15 +44,17 @@ export default function Board({ game, setHandleUndo }: BoardProps) {
   return (
     <DndProvider backend={backend}>
       <DragLayer game={game} />
-      <div className="grid grid-cols-10 grid-rows-2 gap-8 w-full h-full">
-        <div className="col-span-1 row-span-1">
-          <Stock cards={cards} game={game} />
-        </div>
-        <div className="col-span-9 row-span-1">
-          <Foundation cards={cards} game={game} />
-        </div>
-        <div className="col-span-10 row-span-1">
-          <Tableau cards={cards} game={game} />
+      <div className="h-full overflow-y-auto overflow-x-hidden no-scrollbar">
+        <div className="grid grid-cols-10 grid-rows-2 lg:gap-8 lg:mt-8">
+          <div className="col-span-1 row-span-1">
+            <Stock cards={cards} game={game} />
+          </div>
+          <div className="col-span-9 row-span-1">
+            <Foundation cards={cards} game={game} />
+          </div>
+          <div className="col-span-10 row-span-1">
+            <Tableau cards={cards} game={game} />
+          </div>
         </div>
       </div>
     </DndProvider>

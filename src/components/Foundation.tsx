@@ -29,8 +29,6 @@ export default function Foundation({ cards, game }: FoundationProps) {
   const cardAreas = Array.from({ length: 8 }, (_, i) => renderCardArea(i));
 
   return (
-    <div className="grid grid-cols-9 gap-2 h-full place-items-center">
-      {cardAreas}
-    </div>
+    <div className="grid grid-cols-9 gap-2 place-items-center">{cardAreas}</div>
   );
 }

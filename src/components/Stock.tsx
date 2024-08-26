@@ -7,6 +7,7 @@ interface StockProps {
 }
 
 export default function Stock({ cards, game }: StockProps) {
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
   const stock = cards.filter(
     (card) => card.position.x === 0 && card.position.y === 0,
   );
@@ -17,29 +18,34 @@ export default function Stock({ cards, game }: StockProps) {
 
   const renderEmptyCards = () => {
     const noOfEmptyCards = Math.ceil(stock.length / 10);
-    return Array.from({ length: noOfEmptyCards }, (_, index) => (
-      <div
-        key={`empty-${index}`}
-        className={`lg:ml-3 border-black border-2 border-x-[5px] rounded-lg absolute w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] select-none cursor-pointer`}
-        style={{
-          zIndex: index,
-          left: `${index}rem`,
-          transition: "top 0.5s ease, left 0.5s ease",
-        }}
-        onClick={handleLeftClick}
-      >
-        <img
-          src="cards/back1.png"
-          alt="back"
-          className="w-full h-full object-cover pointer-events-none"
-          draggable={false}
-        />
-      </div>
-    ));
+    return Array.from({ length: noOfEmptyCards }, (_, index) => {
+      let leftValue = `${index}rem`;
+      if (isMobile) leftValue = `${index * 0.5}rem`;
+
+      return (
+        <div
+          key={`empty-${index}`}
+          className={`border-black border-2 border-x-[5px] rounded-lg absolute w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] select-none cursor-pointer`}
+          style={{
+            zIndex: index,
+            left: leftValue,
+            transition: "top 0.5s ease, left 0.5s ease",
+          }}
+          onClick={handleLeftClick}
+        >
+          <img
+            src="cards/back1.png"
+            alt="back"
+            className="w-full h-full object-cover pointer-events-none"
+            draggable={false}
+          />
+        </div>
+      );
+    });
   };
 
   return (
-    <div className="mt-1 lg:mt-2 2xl:ml-3">
+    <div className="lg:ml-3 relative w-[4.5rem] h-[6rem] sm:w-[5rem] sm:h-[7rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem]">
       {renderEmptyCards()}
       <CardArea
         key={`${0}-${0}`}
@@ -48,7 +54,7 @@ export default function Stock({ cards, game }: StockProps) {
         cards={[]}
         game={game}
         onClick={handleLeftClick}
-      ></CardArea>
+      />
     </div>
   );
 }

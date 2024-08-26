@@ -27,11 +27,8 @@ export default function GameScreen({
   const game = useMemo(() => new Game(numSuits ?? 1), [numSuits]);
 
   return (
-    <div className="w-full">
-      <div style={{ position: "relative" }}>
-        <Board game={game} setHandleUndo={setHandleUndo} />
-      </div>
-
+    <div className="w-full h-full lg:h-4/5 relative">
+      <Board game={game} setHandleUndo={setHandleUndo} />
       {gamePaused && (
         <PauseMenu continueGame={continueGame} exitGame={handleExit} />
       )}
