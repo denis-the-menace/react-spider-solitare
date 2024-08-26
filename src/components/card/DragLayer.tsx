@@ -1,9 +1,9 @@
 import { useDragLayer } from "react-dnd";
-import { ItemTypes, Game } from "./Game";
-import Card from "./Card";
+import { ItemTypes, GameState } from "@/GameState";
+import Card from "@/components/card/Card";
 
 interface DragLayerProps {
-  game: Game;
+  game: GameState;
 }
 
 export function DragLayer({ game }: DragLayerProps) {
@@ -30,11 +30,17 @@ export function DragLayer({ game }: DragLayerProps) {
           transform: "translate(-50%, -50%)",
         }}
       >
-        {item.draggedCardIds.map((cardId: string, index: number) => (
-          <div key={cardId} className={`absolute top-[${index * 32}px] left-0`}>
-            <Card card={game.getCard(cardId)} />
-          </div>
-        ))}
+        {item.draggedCardIds.map((cardId: string, index: number) => {
+          const card = game.getCard(cardId);
+          if (!card) {
+            return null;
+          }
+          return (
+            <div key={cardId} className={`absolute top-[${index * 32}px] left-0`}>
+              <Card card={card} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

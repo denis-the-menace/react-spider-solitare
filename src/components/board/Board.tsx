@@ -1,15 +1,15 @@
-import Tableau from "./Tableau";
-import Stock from "./Stock";
-import Foundation from "./Foundation";
+import { useState, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { TouchBackend } from "react-dnd-touch-backend";
-import { Game } from "./Game";
-import { useState, useEffect } from "react";
-import { DragLayer } from "./DragLayer";
+import Tableau from "@/components/board/Tableau";
+import Stock from "@/components/board/Stock";
+import Foundation from "@/components/board/Foundation";
+import { GameState } from "@/GameState";
+import { DragLayer } from "@/components/card/DragLayer";
 
 interface BoardProps {
-  game: Game;
+  game: GameState;
   setHandleUndo: (handleUndo: () => void) => void;
 }
 

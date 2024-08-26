@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
-import { ItemTypes, Card as CardType } from "./Game";
+import { ItemTypes, Card as CardType } from "@/GameState";
 import Card from "./Card";
 
 interface CardStackProps {

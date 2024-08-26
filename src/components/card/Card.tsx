@@ -1,4 +1,4 @@
-import { Card as CardType } from "./Game";
+import { Card as CardType } from "@/GameState";
 
 interface CardProps {
   card: CardType;

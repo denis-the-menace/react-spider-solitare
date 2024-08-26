@@ -1,4 +1,4 @@
-import { ItemTypes, Game, Card as CardType } from "./Game";
+import { ItemTypes, GameState, Card as CardType } from "@/GameState";
 import { useDrop } from "react-dnd";
 import CardStack from "./CardStack";
 
@@ -6,7 +6,7 @@ interface CardAreaProps {
   x: number;
   y: number;
   cards: CardType[];
-  game: Game;
+  game: GameState;
   onClick?: () => void;
 }
 

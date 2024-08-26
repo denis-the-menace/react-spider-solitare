@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import PauseMenu from "../components/ui/PauseMenu";
-import { Game } from "../components/Game";
-import Board from "../components/Board";
+import PauseMenu from "@/screens/PauseMenu";
+import { GameState } from "@/GameState";
+import Board from "@/components/board/Board";
 
 interface GameScreenProps {
   numSuits: number | null;
@@ -24,7 +24,7 @@ export default function GameScreen({
     continueGame();
   };
 
-  const game = useMemo(() => new Game(numSuits ?? 1), [numSuits]);
+  const game = useMemo(() => new GameState(numSuits ?? 1), [numSuits]);
 
   return (
     <div className="w-full h-full lg:h-4/5 relative">

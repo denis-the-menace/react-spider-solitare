@@ -1,9 +1,9 @@
-import { Card as CardType, Game } from "./Game";
-import FoundationCardArea from "./FoundationCardArea";
+import { Card as CardType, GameState } from "@/GameState";
+import FoundationCardArea from "@/components/card/FoundationCardArea";
 
 interface FoundationProps {
   cards: CardType[];
-  game: Game;
+  game: GameState;
 }
 
 export default function Foundation({ cards, game }: FoundationProps) {

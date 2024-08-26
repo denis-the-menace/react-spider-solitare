@@ -1,9 +1,9 @@
-import { Card as CardType, Game } from "./Game";
-import CardArea from "./CardArea";
+import { Card as CardType, GameState } from "@/GameState";
+import CardArea from "@/components/card/CardArea";
 
 interface TableauProps {
   cards: CardType[];
-  game: Game;
+  game: GameState;
 }
 
 export default function Tableau({ cards, game }: TableauProps) {

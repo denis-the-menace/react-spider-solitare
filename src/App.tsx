@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import HomeScreen from "./screens/HomeScreen";
-import GameScreen from "./screens/GameScreen";
-import LandscapeWarningScreen from "./screens/LandscapeWarningScreen";
+import HomeScreen from "@/screens/HomeScreen";
+import GameScreen from "@/screens/GameScreen";
+import LandscapeWarningScreen from "@/screens/LandscapeWarningScreen";
 
 export default function App() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);

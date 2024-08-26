@@ -26,7 +26,7 @@ export type CardObserver = (
   faceUp: boolean,
 ) => void;
 
-export class Game {
+export class GameState {
   public cards: Card[] = [];
   private observers: CardObserver[] = [];
   private foundationsCompleted: number = 0;
@@ -34,7 +34,6 @@ export class Game {
 
   public newGame(): void {
     this.history = [];
-    // ... reset game state ...
   }
 
   constructor(suitsToUse: number) {
