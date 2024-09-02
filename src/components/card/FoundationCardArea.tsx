@@ -1,18 +1,17 @@
 import Card from "./Card";
-import { Game, Card as CardType } from "./Game";
+import { GameState, Card as CardType } from "@/GameState";
 
 interface FoundationCardAreaProps {
   x: number;
   y: number;
   cards: CardType[];
-  game: Game;
+  game: GameState;
 }
 
 export default function FoundationCardArea({
   x,
   y,
   cards,
-  game,
 }: FoundationCardAreaProps) {
   if (!cards) return null;
 
@@ -36,7 +35,7 @@ export default function FoundationCardArea({
         />
       ) : (
         <img
-          src="cards/back1.png"
+          src="cards/back_1.png"
           alt="back"
           className="brightness-75 w-full h-full object-cover pointer-events-none"
           draggable={false}

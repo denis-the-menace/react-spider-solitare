@@ -12,14 +12,14 @@ export default function App() {
   );
   const [handleUndo, setHandleUndo] = useState<(() => void) | null>(null);
 
-  // const startGame = (suits: number) => {
-  //   setNumSuits(suits);
-  //   setGameStarted(true);
-  // };
   const startGame = (suits: number) => {
-    setNumSuits(1);
+    setNumSuits(suits);
     setGameStarted(true);
   };
+  // const startGame = (suits: number) => {
+  //   setNumSuits(1);
+  //   setGameStarted(true);
+  // };
 
   const exitGame = () => setGameStarted(false);
   const pauseGame = () => setGamePaused(!gamePaused);
@@ -44,7 +44,7 @@ export default function App() {
             className="container h-full mx-auto flex flex-col justify-between items-start mt-8 max-w-[1600px]"
             style={{ display: isLandscape ? "block" : "none" }}
           >
-            {true ? (
+            {gameStarted ? (
               <GameScreen
                 numSuits={numSuits}
                 gamePaused={gamePaused}
@@ -57,7 +57,7 @@ export default function App() {
               <HomeScreen startGame={startGame} />
             )}
           </main>
-          {true && (
+          {gameStarted && (
             <footer className="absolute w-full bottom-0 flex justify-start p-4 z-[999] gap-4">
               <button
                 onClick={pauseGame}

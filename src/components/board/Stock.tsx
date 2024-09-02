@@ -4,24 +4,20 @@ import CardArea from "@/components/card/CardArea";
 interface StockProps {
   cards: CardType[];
   game: GameState;
+  onDeal: () => void;
 }
 
-export default function Stock({ cards, game }: StockProps) {
+export default function Stock({ cards, game, onDeal }: StockProps) {
   const isMobile = window.matchMedia("(pointer: coarse)").matches;
   const stock = cards.filter(
     (card) => card.position.x === 0 && card.position.y === 0,
   );
-
-  const handleLeftClick = () => {
-    game.dealStockCards(stock);
-  };
 
   const renderEmptyCards = () => {
     const noOfEmptyCards = Math.ceil(stock.length / 10);
     return Array.from({ length: noOfEmptyCards }, (_, index) => {
       let leftValue = `${index}rem`;
       if (isMobile) leftValue = `${index * 0.5}rem`;
-
       return (
         <div
           key={`empty-${index}`}
@@ -31,10 +27,10 @@ export default function Stock({ cards, game }: StockProps) {
             left: leftValue,
             transition: "top 0.5s ease, left 0.5s ease",
           }}
-          onClick={handleLeftClick}
+          onClick={onDeal}
         >
           <img
-            src="cards/back1.png"
+            src="cards/back_1.png"
             alt="back"
             className="w-full h-full object-cover pointer-events-none"
             draggable={false}
@@ -45,7 +41,7 @@ export default function Stock({ cards, game }: StockProps) {
   };
 
   return (
-    <div className="lg:ml-3 relative w-[4.5rem] h-[6rem] sm:w-[5rem] sm:h-[7rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem]">
+    <div className="stock lg:ml-3 relative w-[4.5rem] h-[6rem] sm:w-[5rem] sm:h-[7rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem]">
       {renderEmptyCards()}
       <CardArea
         key={`${0}-${0}`}
@@ -53,7 +49,7 @@ export default function Stock({ cards, game }: StockProps) {
         y={0}
         cards={[]}
         game={game}
-        onClick={handleLeftClick}
+        onClick={onDeal}
       />
     </div>
   );

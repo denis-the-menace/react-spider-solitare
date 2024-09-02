@@ -25,7 +25,6 @@ export default function Card({ card, onCardClick, isDragging }: CardProps) {
             : isMobile
               ? `${card.position.z * 20}px`
               : `${card.position.z * 32}px`,
-        transition: "top 0.5s ease, left 0.5s ease",
       }}
       {...(isMobile
         ? { onTouchStart: handleCardClick }
@@ -37,10 +36,12 @@ export default function Card({ card, onCardClick, isDragging }: CardProps) {
           alt={card.alt}
           className="w-full h-full object-cover pointer-events-none"
           draggable={false}
+          //TODO lazy load
+          loading="lazy"
         />
       ) : (
         <img
-          src="cards/back1.png"
+          src="cards/back_1.png"
           alt="back"
           className="w-full h-full object-cover pointer-events-none"
           draggable={false}

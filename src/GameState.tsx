@@ -20,6 +20,7 @@ export interface CardState {
 }
 
 export type Card = CardProps & CardState;
+
 export type CardObserver = (
   cardId: string,
   position: { x: number; y: number; z: number },
@@ -123,6 +124,12 @@ export class GameState {
     if (card) {
       this.observers.forEach((o) => o && o(cardId, card.position, card.faceUp));
     }
+  }
+
+  public emitChangeForAll(cardIds: string[]): void {
+    cardIds.forEach((cardId) => this.emitChange(cardId));
+    console.log(cardIds);
+    this.saveState();
   }
 
   private saveState() {
@@ -362,11 +369,13 @@ export class GameState {
     return true;
   }
 
-  public dealStockCards(stock: Card[]): void {
+  public dealStockCards(stock: Card[]): Card[] {
+    const dealtCards: Card[] = [];
+
     for (let i = 0; i < 10; i++) {
       const topCard = stock.shift();
 
-      if (!topCard) return;
+      if (!topCard) return [];
 
       const tableauCards = this.cards.filter(
         (c) => c.position.x === i && c.position.y === 1,
@@ -384,10 +393,14 @@ export class GameState {
           : card,
       );
 
-      this.emitChange(topCard.id);
+      dealtCards.push({
+        ...topCard,
+        position: { x: i, y: 1, z: zIndex },
+        faceUp: true,
+      });
     }
 
-    this.saveState();
+    return dealtCards;
   }
 
   public getCard(cardId: string): Card | undefined {
