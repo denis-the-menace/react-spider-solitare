@@ -16,7 +16,7 @@ export default function App() {
     setNumSuits(suits);
     setGameStarted(true);
   };
-  // const startGame = (suits: number) => {
+  // const startGame = () => {
   //   setNumSuits(1);
   //   setGameStarted(true);
   // };

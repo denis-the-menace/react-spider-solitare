@@ -18,7 +18,6 @@ export default function AnimatedCard({
   onAnimationComplete,
 }: AnimatedCardProps) {
   const controls = useAnimation();
-
   useEffect(() => {
     controls.start({
       x: endPos.x,

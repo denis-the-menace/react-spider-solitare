@@ -30,23 +30,12 @@ export default function Card({ card, onCardClick, isDragging }: CardProps) {
         ? { onTouchStart: handleCardClick }
         : { onMouseDown: handleCardClick })}
     >
-      {card.faceUp ? (
-        <img
-          src={card.src}
-          alt={card.alt}
-          className="w-full h-full object-cover pointer-events-none"
-          draggable={false}
-          //TODO lazy load
-          loading="lazy"
-        />
-      ) : (
-        <img
-          src="cards/back_1.png"
-          alt="back"
-          className="w-full h-full object-cover pointer-events-none"
-          draggable={false}
-        />
-      )}
+      <img
+        src={card.faceUp ? card.src : "cards/back_1.png"}
+        alt={card.faceUp ? card.alt : "back"}
+        className="w-full h-full object-cover pointer-events-none"
+        draggable={false}
+      />
     </div>
   );
 }
