@@ -171,9 +171,16 @@ export class GameState {
   private canMoveStack(cards: Card[]): boolean {
     // canMoveCard check ettikten sonra:
     // eger stackteki tum cardlarin suiti ayni degilse return false
+    // eger cardlar ardisik olarak azalmiyorsa return false
 
     const isSameSuit = cards.every((card) => card.suit === cards[0].suit);
     if (!isSameSuit) return false;
+
+    const isSequential = cards.every(
+      (card, index) =>
+        index === 0 || card.rank === cards[index - 1].rank + 1,
+    );
+    if(!isSequential) return false;
 
     return true;
   }

@@ -32,7 +32,7 @@ export default function GameScreen({
   };
 
   return (
-    <div className="w-full h-full lg:h-5/6 relative">
+    <div className="w-full h-full lg:h-[90%] relative">
       {isLoading ? (
         <Preloader game={game} onLoadComplete={handleLoadComplete} />
       ) : (
