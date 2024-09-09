@@ -2,6 +2,12 @@ import { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { Card as CardType } from "@/GameState";
 
+export interface AnimatedCardType {
+  card: CardType;
+  startPos: { x: number; y: number };
+  endPos: { x: number; y: number };
+}
+
 interface AnimatedCardProps {
   card: CardType;
   startPos: { x: number; y: number };

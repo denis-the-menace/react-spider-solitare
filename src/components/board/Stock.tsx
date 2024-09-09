@@ -1,20 +1,67 @@
+import { useState } from "react";
 import { Card as CardType, GameState } from "@/GameState";
 import CardArea from "@/components/card/CardArea";
+import { AnimatedCardType } from "../card/AnimatedCard";
 
 interface StockProps {
   cards: CardType[];
   game: GameState;
-  onDeal: () => void;
+  onDeal: (newAnimatingCards: AnimatedCardType[]) => void;
+  isAnimating: boolean;
 }
 
-export default function Stock({ cards, game, onDeal }: StockProps) {
+export default function Stock({
+  cards,
+  game,
+  onDeal,
+  isAnimating,
+}: StockProps) {
   const isMobile = window.matchMedia("(pointer: coarse)").matches;
   const stock = cards.filter(
     (card) => card.position.x === 0 && card.position.y === 0,
   );
+  const [noOfEmptyCards, setNoOfEmptyCards] = useState(
+    Math.ceil(stock.length / 10),
+  );
+
+  const handleDealCards = () => {
+    if (isAnimating) return;
+
+    const stockRect = document.querySelector(".stock")?.getBoundingClientRect();
+    const stock = cards.filter(
+      (card) => card.position.x === 0 && card.position.y === 0,
+    );
+    if (!stockRect) return;
+
+    const dealtCards = game.dealStockCards(stock);
+
+    const newAnimatingCards: AnimatedCardType[] = dealtCards
+      .map((card, index) => {
+        console.log(index);
+        const tableauRect = document
+          .querySelector(`.tableau-area-${index}`)
+          ?.getBoundingClientRect();
+        if (!tableauRect) return null;
+
+        return {
+          card,
+          startPos: {
+            x: stockRect.left + (stock.length / 10) * 16,
+            y: stockRect.top,
+          },
+          endPos: {
+            x: tableauRect.left,
+            y: tableauRect.top + card.position.z * 32,
+          },
+        };
+      })
+      .filter(Boolean) as AnimatedCardType[];
+
+    setNoOfEmptyCards(...[noOfEmptyCards - 1]);
+    onDeal(newAnimatingCards);
+  };
 
   const renderEmptyCards = () => {
-    const noOfEmptyCards = Math.ceil(stock.length / 10);
     return Array.from({ length: noOfEmptyCards }, (_, index) => {
       let leftValue = `${index}rem`;
       if (isMobile) leftValue = `${index * 0.5}rem`;
@@ -27,7 +74,7 @@ export default function Stock({ cards, game, onDeal }: StockProps) {
             left: leftValue,
             transition: "top 0.5s ease, left 0.5s ease",
           }}
-          onClick={onDeal}
+          onClick={handleDealCards}
         >
           <img
             src="cards/back_1.png"
@@ -49,7 +96,7 @@ export default function Stock({ cards, game, onDeal }: StockProps) {
         y={0}
         cards={[]}
         game={game}
-        onClick={onDeal}
+        onClick={handleDealCards}
       />
     </div>
   );
