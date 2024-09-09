@@ -54,7 +54,7 @@ export default function Board({ game, setHandleUndo }: BoardProps) {
   return (
     <DndProvider backend={backend}>
       <DragLayer game={game} />
-      <div className="h-full overflow-y-auto overflow-x-hidden no-scrollbar">
+      <div className="h-full overflow-y-auto overflow-x-hidden no-scrollbar px-4">
         <div className="grid grid-cols-10 grid-rows-2 lg:gap-8 lg:mt-8">
           <div className="col-span-1 row-span-1">
             <Stock

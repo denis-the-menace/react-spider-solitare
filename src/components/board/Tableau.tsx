@@ -22,7 +22,7 @@ export default function Tableau({ cards, game }: TableauProps) {
   };
   const cardAreas = Array.from({ length: 10 }, (_, i) => renderCardArea(i));
   return (
-    <div className="grid grid-cols-10 gap-2 place-items-center">
+    <div className="mt-2 md:mt-1 lg:mt-0 grid grid-cols-10 gap-2 place-items-center">
       {cardAreas}
     </div>
   );

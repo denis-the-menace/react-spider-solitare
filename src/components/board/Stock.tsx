@@ -68,7 +68,7 @@ export default function Stock({
       return (
         <div
           key={`empty-${index}`}
-          className={`border-black border-2 border-x-[5px] rounded-lg absolute w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] select-none cursor-pointer`}
+          className={`stock border-black border-2 border-x-[5px] rounded-lg absolute w-[4.5rem] h-[6rem] md:w-[6rem] md:h-[8rem] lg:w-[7rem] lg:h-[10rem] xl:w-[8rem] xl:h-[12rem] select-none cursor-pointer`}
           style={{
             zIndex: index,
             left: leftValue,

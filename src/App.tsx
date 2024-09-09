@@ -41,8 +41,7 @@ export default function App() {
       ) : (
         <>
           <main
-            className="container h-full mx-auto flex flex-col justify-between items-start mt-8 max-w-[1600px]"
-            style={{ display: isLandscape ? "block" : "none" }}
+            className={`${isLandscape ? "block" : "none"} container h-full mx-auto flex flex-col justify-between items-start mt-2 md:mt-4 lg:mt-8 max-w-[1600px]`}
           >
             {gameStarted ? (
               <GameScreen
