@@ -101,6 +101,8 @@ export class GameState {
     });
 
     this.cards = [...tableauCards, ...stock];
+
+    this.saveState();
   }
 
   private shuffleDeck(deck: Card[]): Card[] {
@@ -138,12 +140,18 @@ export class GameState {
   }
 
   public undo(): boolean {
-    if (this.history.length === 0) {
+    if (this.history.length <= 1) {
       return false;
     }
 
-    this.cards = this.history.pop()!;
+    this.history.pop();
+
+    this.cards = JSON.parse(
+      JSON.stringify(this.history[this.history.length - 1]),
+    );
+
     this.cards.forEach((card) => this.emitChange(card.id));
+
     return true;
   }
 
@@ -177,10 +185,9 @@ export class GameState {
     if (!isSameSuit) return false;
 
     const isSequential = cards.every(
-      (card, index) =>
-        index === 0 || card.rank === cards[index - 1].rank + 1,
+      (card, index) => index === 0 || card.rank === cards[index - 1].rank + 1,
     );
-    if(!isSequential) return false;
+    if (!isSequential) return false;
 
     return true;
   }
